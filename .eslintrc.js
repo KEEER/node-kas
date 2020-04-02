@@ -1,0 +1,43 @@
+module.exports = {
+  root: true,
+  env: {
+    browser: true,
+    node: true,
+  },
+  parserOptions: {
+    parser: 'babel-eslint',
+  },
+  extends: [
+    '@nuxtjs',
+    'plugin:nuxt/recommended',
+  ],
+  rules: {
+    'array-bracket-spacing': [ 'error', 'always' ],
+    'arrow-parens': 'off',
+    'comma-dangle': [ 'error', 'always-multiline' ],
+    'comma-spacing': 'error',
+    'curly': 'off',
+    'indent': [ 'error', 2 ],
+    'key-spacing': 'error',
+    'keyword-spacing': 'error',
+    'linebreak-style': [ 'error', 'unix' ],
+    'no-console': 'off',
+    'no-extra-semi': 'off',
+    'no-multi-spaces': 'error',
+    'no-trailing-spaces': 'error',
+    'no-return-assign': 'off',
+    'no-undef': 'warn',
+    'no-unused-vars': 'warn',
+    'nuxt/no-cjs-in-config': 'off',
+    'object-curly-spacing': [ 'error', 'always' ],
+    'quotes': [ 'error', 'single' ],
+    'semi': [ 'error', 'never', { beforeStatementContinuationChars: 'always' } ],
+    'space-before-blocks': [ 'error', 'always' ],
+    'space-before-function-paren': [ 'error', 'always' ],
+    'space-in-parens': 'error',
+    'space-infix-ops': 'error',
+    'space-unary-ops': 'error',
+    'spaced-comment': [ 'error', 'always', { exceptions: [ '*' ] } ],
+    'vue/singleline-html-element-content-newline': 'off',
+  }
+}

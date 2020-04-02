@@ -1,0 +1,26 @@
+require('dotenv').config()
+const { readFileSync } = require('fs')
+const path = require('path')
+const consola = require('consola')
+const { useClient } = require('../server/db')
+
+const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
+
+useClient(async client => {
+  consola.warn('Press Ctrl+C in 10 seconds to abort')
+  await delay(10000)
+  consola.info('Initialization started.')
+  const startTime = Date.now()
+  consola.info('Load init script...')
+  const initScript = readFileSync(path.resolve(__dirname, '../sql/init.sql'))
+    .toString()
+    .replace(/public\./g, 'public.PRE_')
+    .replace(/IDX_/g, 'IDX_PRE_')
+  consola.info('Run init script...')
+  await client.query(initScript)
+  consola.success({ message: `Initialization success in ${(Date.now() - startTime) / 1000} second(s)!`, badge: true })
+  process.exit(0)
+}).catch(e => {
+  consola.fatal(e)
+  process.exit(1)
+})
