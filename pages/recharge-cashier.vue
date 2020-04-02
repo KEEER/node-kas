@@ -46,7 +46,10 @@ export default {
       console.log('New poll @ ', this.pollUrl)
       try {
         const res = await fetch(this.pollUrl).then(res => res.json())
-        if (res.code === 'ETIMEOUT') return this.repoll()
+        if (res.code === 'ETIMEOUT') {
+          this.blur = false
+          return this.repoll()
+        }
         if (res.status !== 0) {
           if (res.message) this.title = res.message
           this.snackbar(res.message || '未知错误')
