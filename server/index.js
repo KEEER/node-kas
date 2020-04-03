@@ -285,7 +285,11 @@ config.dev = app.env !== 'production'
 
   // queries
   router.get('/api/user-information', requireLogin, ctx => {
-    if (/^https?:\/\/[^.]+\.keeer.net\//.test(ctx.get('origin'))) ctx.set('Access-Control-Allow-Origin', '*')
+    if (/^https?:\/\/[^.]+\.keeer.net/.test(ctx.get('origin'))) {
+      ctx.set('Access-Control-Allow-Origin', ctx.get('origin'))
+      ctx.set('Vary', 'Origin')
+      ctx.set('Access-Control-Allow-Credentials', 'true')
+    }
     const { avatarName, nickname, keeerId, kredit } = ctx.state.user.options
     const avatar = ctx.avatarFromName(avatarName)
     return ctx.body = { status: 0, result: { avatar, nickname, keeerId, kredit } }
