@@ -168,6 +168,11 @@ exports.User = class User {
 
   static async fromContext (ctx) {
     const token = ctx.cookies.get(process.env.TOKEN_COOKIE_NAME)
+    const token2Match = ctx.get('Authorization').toLowerCase().match(/^bearer ([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/)
+    if (token2Match && token2Match[1]) {
+      const user = await User.fromToken(token2Match[1])
+      if (user) return user
+    }
     return await User.fromToken(token)
   }
 

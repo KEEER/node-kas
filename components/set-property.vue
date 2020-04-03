@@ -3,17 +3,19 @@
     <v-btn icon color="#f5fafd" class="back" @click="back"><v-icon>mdi-arrow-left</v-icon></v-btn>
     <headline :title="title" :subtitle="subtitle" />
     <container profile>
-      <slot />
-      <v-btn
-        v-if="!noSubmit"
-        :disabled="!valid || submitting"
-        depressed
-        color="primary"
-        class="confirm"
-        @click="submit"
-      >
-        确认
-      </v-btn>
+      <form @submit="submit(); $event.preventDefault()">
+        <slot />
+        <v-btn
+          v-if="!noSubmit"
+          type="submit"
+          :disabled="!valid || submitting"
+          depressed
+          color="primary"
+          class="confirm"
+        >
+          确认
+        </v-btn>
+      </form>
     </container>
   </div>
 </template>

@@ -104,6 +104,12 @@ Form fields:
 - `identity:string` Identity
 - `amount:number` Cents
 
+Identity types:
+- `phone-number` or `phoneNumber`
+- `email`
+- `keeer-id` or `keeerId`
+- `kiuid`
+
 Throws: 
 - `{"status":3,"code":"EINVALID_AMOUNT"}` Invalid amount
 - `{"status":4,"code":"EINSUFFICIENT_KREDIT"}` User has insufficient kredit

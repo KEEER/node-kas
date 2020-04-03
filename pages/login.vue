@@ -15,50 +15,54 @@
             <v-tab href="#signup">注册</v-tab>
 
             <v-tab-item value="login">
-              <v-text-field
-                v-model="identity"
-                outlined
-                autofocus
-                hide-details="auto"
-                label="手机号、邮箱或者 KEEER ID"
-                autocomplete="tel"
-              />
-              <v-text-field
-                v-model="password"
-                type="password"
-                outlined
-                hide-details="auto"
-                label="密码"
-                autocomplete="current-password"
-              />
-              <v-btn color="primary" class="confirm-button" :disabled="!loginValid || busy" @click="login">登录</v-btn>
-              <v-btn text class="forgot-password-button" to="/password-findback" nuxt>忘了密码</v-btn>
+              <form @submit="login(); $event.preventDefault()">
+                <v-text-field
+                  v-model="identity"
+                  outlined
+                  autofocus
+                  hide-details="auto"
+                  label="手机号、邮箱或者 KEEER ID"
+                  autocomplete="tel"
+                />
+                <v-text-field
+                  v-model="password"
+                  type="password"
+                  outlined
+                  hide-details="auto"
+                  label="密码"
+                  autocomplete="current-password"
+                />
+                <v-btn type="submit" color="primary" class="confirm-button" :disabled="!loginValid || busy">登录</v-btn>
+                <v-btn text class="forgot-password-button" to="/password-findback" nuxt>忘了密码</v-btn>
+              </form>
             </v-tab-item>
             <v-tab-item value="signup">
-              <v-text-field
-                v-model="identity"
-                type="tel"
-                outlined
-                autofocus
-                hide-details="auto"
-                label="您的手机号"
-                autocomplete="tel"
-              />
-              <sms-verify v-model="code" :number="identity" type="SMS_TYPE_REGISTER" />
-              <v-text-field
-                v-model="password"
-                type="password"
-                autocomplete="new-password"
-                outlined
-                persistent-hint
-                hint="6位以上，请挑选一个强壮的密码。"
-                label="您的密码"
-              />
-              <v-row align="end" class="agree-terms">
-                <v-checkbox v-model="agreeTerms" hide-details />
-                <span>我已阅读并同意<a href="/terms" target="_blank">用户协议和隐私政策</a></span>
-              </v-row>
-              <v-btn class="confirm-button" color="primary" :disabled="!signupValid || busy" @click="signup">注册</v-btn>
+              <form @submit="signup(); $event.preventDefault()">
+                <v-text-field
+                  v-model="identity"
+                  type="tel"
+                  outlined
+                  autofocus
+                  hide-details="auto"
+                  label="您的手机号"
+                  autocomplete="tel"
+                />
+                <sms-verify v-model="code" :number="identity" type="SMS_TYPE_REGISTER" />
+                <v-text-field
+                  v-model="password"
+                  type="password"
+                  autocomplete="new-password"
+                  outlined
+                  persistent-hint
+                  hint="6位以上，请挑选一个强壮的密码。"
+                  label="您的密码"
+                />
+                <v-row align="end" class="agree-terms">
+                  <v-checkbox v-model="agreeTerms" hide-details />
+                  <span>我已阅读并同意<a href="/terms" target="_blank">用户协议和隐私政策</a></span>
+                </v-row>
+                <v-btn type="submit" class="confirm-button" color="primary" :disabled="!signupValid || busy">注册</v-btn>
+              </form>
             </v-tab-item>
           </v-tabs>
         </v-card>

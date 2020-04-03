@@ -18,10 +18,23 @@ module.exports = {
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
     ],
+    htmlAttrs: { lang: 'zh-CN' },
   },
   loading: { color: '#f5fafd' },
   build: {
     extractCSS: true,
+    optimization: {
+      splitChunks: {
+        cacheGroups: {
+          styles: {
+            name: 'styles',
+            test: /\.(css|vue)$/,
+            chunks: 'all',
+            enforce: true,
+          },
+        },
+      },
+    },
     publicPath,
   },
   buildModules: [

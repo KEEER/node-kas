@@ -23,6 +23,7 @@ CREATE TABLE public.users (
 );
 
 CREATE INDEX IDX_users_keeer_id ON public.users (keeer_id);
+CREATE INDEX IDX_users_kiuid ON public.users (kiuid);
 CREATE INDEX IDX_users_phone_number ON public.users (phone_number);
 CREATE INDEX IDX_users_email ON public.users (email);
 
