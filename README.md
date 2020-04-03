@@ -2,6 +2,12 @@
 
 > A drop-in replacement for KAS.
 
+## Services
+To add a service, use `node scripts/add-service` which is an interactive CLI.
+To remove a service, use `DELETE FROM <table prefix>services WHERE name = '<service name>';` .
+To modify a service, use `UPDATE <table prefix>services SET <key> TO <value> WHERE name = '<service name>'` .
+See `sql/init.sql` for the database structure.
+
 ## API
 
 - RL: Requires Login (Cookies)
@@ -9,7 +15,7 @@
 - RS: Requires Service (`Authorization: Bearer <token>` HTTP header)
 - NC: CSRF Token needed (See [CSRF section](#csrf))
 
-Request should be `application/x-www-form-urlencoded` and `application/json` and `Content-Type` header should be set.
+Request should be `application/x-www-form-urlencoded` or `application/json` and `Content-Type` header should be set.
 
 Returns JSON if not otherwise stated:
 - `{"status":0,"message":"成功","result":"some result"}` - `0` indicates OK
