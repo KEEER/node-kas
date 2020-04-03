@@ -22,7 +22,7 @@
                   autofocus
                   hide-details="auto"
                   label="手机号、邮箱或者 KEEER ID"
-                  autocomplete="tel"
+                  autocomplete="username"
                 />
                 <v-text-field
                   v-model="password"

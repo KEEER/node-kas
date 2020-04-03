@@ -15,7 +15,7 @@ Returns JSON if not otherwise stated:
 - `{"status":0,"message":"成功","result":"some result"}` - `0` indicates OK
 - `{"status":1,"message":"非法请求"}` - `1` indicates an invalid request
 - `{"status":-1,"message":"TypeError: Cannot convert null or undefined to object"}` - `-1` indicates an unknown error
-- `{"status":-2,"message":"TypeError: Cannot convert null or undefined to object"}` - `-2` indicates unauthorized
+- `{"status":-2,"message":"您尚未登录"}` - `-2` indicates unauthorized
 
 ### `POST /api/avatar`
 RL NC Multipart, Sets avatar    
@@ -61,7 +61,7 @@ Form fields:
 - `code:string` Verification code
 
 ### `PUT /api/sms-code`
-Sends SMS.    
+RA(1min), Sends SMS.    
 Form fields:
 - `number:string` Phone number
 - `type:enum` Send type
