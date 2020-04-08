@@ -1,6 +1,9 @@
 <template>
-  <content>
+  <content :class="{ 'custom-logo': customLogo }">
     <div class="background" :style="backgroundStyle" />
+    <a v-if="customLogo" id="keeer-icon" class="link" target="_blank" href="https://keeer.net/?utm_source=nodekas&utm_medium=login_top">
+      <img src="https://keeer.net/img/logo/light-large.svg">
+    </a>
     <div id="wrapper">
       <div id="slogan">
         <img id="logo" :src="logoSrc">
@@ -53,8 +56,7 @@
                   type="password"
                   autocomplete="new-password"
                   outlined
-                  persistent-hint
-                  hint="6位以上，请挑选一个强壮的密码。"
+                  hide-details="auto"
                   label="您的密码"
                 />
                 <v-row align="end" class="agree-terms">
@@ -71,6 +73,7 @@
         <a href="https://keeer.net/" class="link"><img class="keeer-logo" src="https://keeer.net/img/logo/light-large.svg"></a>
         <a href="/terms" class="link">用户协议与隐私政策</a>
         <a href="/" class="link">联系我们</a>
+        <a v-if="backgroundCopyright" :href="backgroundCopyrightUrl" class="link" target="_blank" rel="noopener">{{ backgroundCopyright }}</a>
       </footer>
     </div>
   </content>
@@ -107,8 +110,11 @@ export default {
       agreeTerms: false,
       busy: false,
       title: '登录您的 KEEER 账户',
-      logoSrc: 'https://keeer.net/img/logo/dark-square.jpg',
-      backgroundUrl: '',
+      logoSrc: 'https://keeer.net/img/logo/light-square.jpg',
+      backgroundUrl: 'https://nodekas-production.oss-cn-beijing.aliyuncs.com/assets/login-background.webp',
+      backgroundCopyright: '背景图片-CC BY-SA 4.0',
+      backgroundCopyrightUrl: 'https://commons.wikimedia.org/wiki/File:Ellerberg_1274451.jpg',
+      customLogo: false,
     }
   },
   computed: {
@@ -126,6 +132,15 @@ export default {
     this.$nextTick(() => this.loadTabs = true)
     if (this.useCustom && this.useCustom !== 'redirect') {
       for (const k of [ 'title', 'logoSrc', 'backgroundUrl' ]) this[k] = this.useCustom[k] || this[k]
+      if (this.useCustom.logoSrc) this.customLogo = true
+      if (this.useCustom.backgroundUrl) {
+        if (this.useCustom.backgroundCopyright) {
+          this.backgroundCopyright = this.useCustom.backgroundCopyright
+          this.backgroundCopyrightUrl = this.useCustom.backgroundCopyrightUrl
+        } else {
+          this.backgroundCopyright = null
+        }
+      }
       if (this.useCustom.themeColor) {
         this.$vuetify.theme.themes.light.primary = '#002d4d'
         setTimeout(() => this.$vuetify.theme.themes.light.primary = this.useCustom.themeColor, 500)
@@ -191,7 +206,8 @@ export default {
 content { display: block; }
 .background {
   content: ' ';
-  background: linear-gradient(64deg, #9a1b99, #002d4d);
+  background-color: #002d4d;
+  background-image: linear-gradient(64deg, #9a1b99, #002d4d);
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center center;
@@ -206,14 +222,24 @@ content { display: block; }
 #wrapper {
   height: 100vh;
   width: 100%;
-  display: table;
+  display: flex;
+  z-index: 1;
 }
+#keeer-icon {
+  position: absolute;
+  top: 32px;
+  left: 32px;
+  z-index: 3;
+}
+#keeer-icon, #keeer-icon > img { height: 32px; }
 
 #title { margin: 22px 0; }
-#slogan, #regbox-out { display: table-cell; }
 #slogan {
-  position: relative;
+  flex: 1;
+  z-index: 2;
   color: #f5fafd;
+  padding: 96px 64px 64px;
+  position: relative;
 }
 #subtitle { position: relative; }
 #subtitle:before {
@@ -228,21 +254,15 @@ content { display: block; }
   z-index: 5;
 }
 
-#regbox-out, #slogan { padding: 64px; }
+#regbox-out { padding: 64px; }
 #regbox {
   padding: 30px;
-  width: 300px;
-  position: relative;
   z-index: 10;
   overflow: hidden;
 }
 #regbox-out {
-  width: 300px;
-  padding-top: 94px;
-  padding-right: 100px;
-  padding-bottom: 0;
-  position: relative;
-  top: -32px;
+  width: 464px;
+  padding: 94px 100px 0 64px;
 }
 
 .checkbox-label {
@@ -263,6 +283,7 @@ footer {
   color: #f5fafd;
   width: auto;
   left: 64px;
+  z-index: 3;
 }
 
 .keeer-logo {
@@ -280,14 +301,17 @@ footer {
 }
 .link:hover { opacity: 1; }
 
-@media(min-width: 800px) {
+@media(min-width: 1000px) {
   #slogan { padding-left: 128px; }
-  #regbox, #regbox-out { width: 360px; }
+  #regbox-out { width: 524px; }
   footer { left: 128px; }
 }
 
 @media(min-width: 1300px) {
-  #regbox-out { padding-right: 256px; }
+  #regbox-out {
+    padding-right: 256px;
+    width: 680px;
+  }
   #slogan { padding-left: 164px; }
   #subtitle::before { right: -256px; }
   footer { left: 164px; }
@@ -300,6 +324,7 @@ footer {
     text-align: center;
     width: 100%;
   }
+  .custom-logo #slogan { margin-top: 64px; }
   #regbox {
     display: inline-block;
     text-align: left;
