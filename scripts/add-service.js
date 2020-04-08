@@ -9,6 +9,8 @@ const loginPrefQuestions = {
   title: 'Login page title:',
   logoSrc: 'Service icon URL:',
   backgroundUrl: 'Login page background image URL:',
+  backgroundCopyright: 'Background image copyright text:',
+  backgroundCopyrightUrl: 'Background image copyright link URL:',
   themeColor: 'Login page theme color:',
   redirectUrl: 'Login redirect URL:',
 }

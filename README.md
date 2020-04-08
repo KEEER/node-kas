@@ -87,7 +87,7 @@ Returns:
 
 ### `GET /api/login-config?service=<service name>`
 Gets login UI config for the designated service    
-Returns: `{ title, logoSrc, backgroundUrl, themeColor, redirectUrl }`
+Returns: `{ title, logoSrc, backgroundUrl, themeColor, redirectUrl, backgroundCopyright, backgroundCopyrightUrl }`
 
 ### `GET /api/<login token>/kiuid`
 RS, Gets KIUID of the token.    

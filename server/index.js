@@ -297,7 +297,7 @@ config.dev = app.env !== 'production'
   router.get('/api/login-config', async ctx => {
     if (!ctx.query.service) return ctx.body = INVALID_REQUEST
     const cfg = await ctx.getServiceLoginConfig(ctx.query.service)
-    // cfg: { title, logoSrc, backgroundUrl, themeColor, redirectUrl }
+    // cfg: { title, logoSrc, backgroundUrl, themeColor, redirectUrl, backgroundCopyright, backgroundCopyrightUrl }
     if (cfg) return ctx.body = { status: 0, result: cfg }
     return ctx.body = { status: 0, result: false }
   })

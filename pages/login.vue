@@ -95,10 +95,10 @@ export default {
       }
       if (ctx.state.user) return ctx.redirect('/')
       return { useCustom: false }
-    } else {
+    } else if (location.search && /service=/.test(location.search)) {
       const res = await fetch('/api/login-config' + location.search).then(res => res.json())
       return { useCustom: res.result }
-    }
+    } else return { useCustom: false }
   },
   data () {
     return {
