@@ -350,7 +350,10 @@ footer {
 }
 
 .hidden { display: none; }
-#logo { height: 128px; }
+#logo {
+  height: 128px;
+  border-radius: 5px;
+}
 
 .confirm-button {
   margin-top: 12px;
