@@ -30,6 +30,7 @@ export default {
       if (!this.number) return
       try {
         const res = await fetch('/api/sms-code', {
+          credentials: 'same-origin',
           method: 'put',
           body: JSON.stringify({ number: this.number, type: this.type }),
           headers: { 'Content-Type': 'application/json' },

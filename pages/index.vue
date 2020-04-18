@@ -63,7 +63,7 @@ export default {
       const avatar = ctx.avatarFromName(avatarName)
       return { notLoggedIn: false, nickname, kredit, avatar, keeerId }
     } else {
-      const res = await fetch('/api/user-information').then(res => res.json())
+      const res = await fetch('/api/user-information', { credentials: 'same-origin' }).then(res => res.json())
       if (res.status !== 0) return notLoggedIn
       else {
         const { nickname, kredit, avatar, keeerId } = res.result
@@ -77,7 +77,7 @@ export default {
   methods: {
     async logout () {
       try {
-        const res = await fetch('/api/token?set-cookie=true', { method: 'delete' }).then(res => res.json())
+        const res = await fetch('/api/token?set-cookie=true', { method: 'delete', credentials: 'same-origin' }).then(res => res.json())
         if (res.status !== 0) this.snackbar(res.message || '未知错误')
         else {
           this.snackbar(res.message || '您已经成功退出登录')

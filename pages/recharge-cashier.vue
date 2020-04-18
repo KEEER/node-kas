@@ -45,7 +45,7 @@ export default {
     async poll () {
       console.log('New poll @ ', this.pollUrl)
       try {
-        const res = await fetch(this.pollUrl).then(res => res.json())
+        const res = await fetch(this.pollUrl, { credentials: 'same-origin' }).then(res => res.json())
         if (res.code === 'ETIMEOUT') {
           this.blur = false
           return this.repoll()

@@ -73,6 +73,7 @@ export default {
       try {
         this.submitting = true
         const res = await fetch(this.putPath, {
+          credentials: 'same-origin',
           method: 'put',
           body: JSON.stringify(this.getData()),
           headers: { 'Content-Type': 'application/json' },

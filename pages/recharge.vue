@@ -70,7 +70,7 @@ export default {
       const { nickname } = ctx.state.user.options
       return { notLoggedIn: false, nickname }
     } else {
-      const res = await fetch('/api/user-information').then(res => res.json())
+      const res = await fetch('/api/user-information', { credentials: 'same-origin' }).then(res => res.json())
       if (res.status !== 0) return notLoggedIn
       else {
         const { nickname } = res.result
@@ -90,7 +90,7 @@ export default {
       if (amount > 100000) return this.snackbar('充值金额过大，系统无法处理')
       const url = new URL('/api/recharge-order', location.href)
       url.search = new URLSearchParams({ amount })
-      const order = await fetch(url, { method: 'put' }).then(res => res.json())
+      const order = await fetch(url, { method: 'put', credentials: 'same-origin' }).then(res => res.json())
       if (order.status !== 0) return this.snackbar(order.message || '无法创建请求')
       const { result } = order
       if (/^https?:\/\//.test(result)) location = result

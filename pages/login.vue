@@ -163,6 +163,7 @@ export default {
       this.busy = true
       try {
         const res = await fetch('/api/token?set-cookie=true', {
+          credentials: 'same-origin',
           method: 'put',
           headers: { Authorization: `Basic ${btoa(`${this.identity}:${this.password}`)}` },
         }).then(res => res.json())
@@ -182,6 +183,7 @@ export default {
       try {
         const { identity: number, code, password } = this
         const res = await fetch('/api/user?set-cookie=true', {
+          credentials: 'same-origin',
           method: 'put',
           body: JSON.stringify({ number, code, password }),
           headers: { 'Content-Type': 'application/json' },
