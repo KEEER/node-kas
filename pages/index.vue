@@ -95,15 +95,12 @@ export default {
 
 <style scoped>
 .avatar-editable {
-  -webkit-box-flex: 0;
-  box-flex: 0;
   -webkit-flex-grow: 0;
   flex-grow: 0;
   -webkit-flex-shrink: 0;
   flex-shrink: 0;
   -webkit-border-radius: 4px;
   border-radius: 4px;
-  margin-left: 16px;
   overflow: hidden;
   position: relative;
   width: 60px;

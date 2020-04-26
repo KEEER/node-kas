@@ -4,12 +4,16 @@
     <div class="content">
       <h2 class="display-3 recharge-title">为 <span dir="ltr">{{ nickname || '新用户' }}</span> 充值信用点</h2>
       <nuxt-link v-if="!nickname" to="/set-nickname">设置昵称</nuxt-link>
-      <p class="subtitle-1">充值 Kredit 以享受 KEEER 提供的付费服务</p>
+      <p class="subtitle-1">充值信用点以享受 KEEER 提供的付费服务</p>
       <p class="subtitle-2">
         请确保充值前您已经悉知并同意
-        <a href="/kredit-terms" class="link"><b>Kredit 条款（点击以查看）</b></a>，继续操作代表您已经同意该条款
+        <a href="/kredit-terms" class="link"><strong>Kredit 条款（点击以查看）</strong></a>，继续操作代表您已经同意该条款
       </p>
       <div class="card-container">
+        <v-card class="option-card only-on-mobile" @click="recharge(2000)">
+          <p class="headline">充值 20 信用点</p>
+          <p class="display-1">20 元</p>
+        </v-card>
         <v-card class="option-card" @click="recharge(1024)">
           <p class="headline">充值 10.24 信用点</p>
           <p class="display-1">10.24 元</p>
@@ -22,7 +26,7 @@
           <p class="headline">充值 1 信用点</p>
           <p class="display-1">1 元</p>
         </v-card>
-        <v-card class="option-card">
+        <v-card class="option-card custom">
           <p class="headline">自定义数额充值</p>
           <p class="body-1">1 元 → 1 信用点</p>
           <div class="recharge-input-container">
@@ -115,7 +119,7 @@ content {
   background-color: #eaeaea;
   color: #002d4d;
 }
-.recharge-title { margin: 50px 0 16px; }
+.recharge-title { margin: 70px 0 16px; }
 .content {
   display: flex;
   flex-direction: column;
@@ -133,6 +137,7 @@ content {
 }
 .option-card .headline { margin: 24px 0; }
 .option-card .display-1 { margin: 34px 0; }
+.only-on-mobile { display: none; }
 .card-container {
   display: flex;
   justify-content: center;
@@ -151,14 +156,10 @@ footer>a {
   flex-direction: column;
   align-items: center;
 }
-.recharge-input .v-input {
-  width: 80%;
-}
-.recharge-input-container {
-  text-align: center;
-}
+.recharge-input .v-input { width: 80%; }
+.recharge-input-container { text-align: center; }
 .recharge-button {
-  margin-top: 16px;
+  margin: 16px 0;
 }
 footer {
   padding: 12px 10px;
@@ -175,5 +176,31 @@ footer {
 }
 .amount-text-field {
   width: 80%;
+}
+
+@media (max-width: 768px) {
+  .only-on-mobile { display: flex; }
+  .recharge-title {
+    font-size: 2rem !important;
+    line-height: 2rem;
+  }
+  .option-card {
+    height: auto;
+    width: 42%;
+    margin: 8px;
+  }
+  .option-card .headline {
+    font-size: 1rem !important;
+    margin: 8px 0;
+  }
+  .custom .headline {
+    font-size: 1.25rem !important;
+    margin-top: 16px;
+  }
+  .option-card .display-1 {
+    margin: 0 0 16px;
+    font-size: 1.5rem !important;
+  }
+  .option-card.custom { width: 80%; }
 }
 </style>

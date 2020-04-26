@@ -330,6 +330,7 @@ footer {
   #regbox {
     display: inline-block;
     text-align: left;
+    width: 90%;
   }
   #regbox-out { top: 0; }
   #regbox-out::before, #regbox-out::after {

@@ -16,4 +16,12 @@ export default {
   font-weight: 200;
   margin: 40px 0 16px;
 }
+
+@media (max-width: 768px) {
+  .v-application h1.display-3 {
+    font-size: 2rem !important;
+    line-height: 2rem;
+    font-weight: 400;
+  }
+}
 </style>
