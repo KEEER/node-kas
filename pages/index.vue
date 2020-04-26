@@ -9,7 +9,7 @@
           <v-list-item-action>
             <div class="avatar-editable">
               <div class="avatar-wrapper">
-                <img class="avatar-img" :src="avatar" aria-hidden="true">
+                <img class="avatar-img" :src="avatar" aria-hidden="true" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjwvc3ZnPg=='">
               </div>
               <div class="avatar-mask">
                 <v-icon color="#f5fafd" class="avatar-mask-icon">mdi-pencil</v-icon>
@@ -101,8 +101,8 @@ export default {
   flex-grow: 0;
   -webkit-flex-shrink: 0;
   flex-shrink: 0;
-  -webkit-border-radius: 50%;
-  border-radius: 50%;
+  -webkit-border-radius: 4px;
+  border-radius: 4px;
   margin-left: 16px;
   overflow: hidden;
   position: relative;
@@ -110,13 +110,13 @@ export default {
   height: 60px;
 }
 .avatar-wrapper {
-  -webkit-border-radius: 50%;
-  border-radius: 50%;
+  -webkit-border-radius: 4px;
+  border-radius: 4px;
   height: 100%;
   width: auto;
 }
 .avatar-img {
-  border-radius: 50%;
+  border-radius: 4px;
   width: 60px;
   height: 60px;
 }
@@ -129,7 +129,7 @@ export default {
   right: 0;
   text-align: center;
 }
-.avatar-mask-icon {
+.avatar-mask .avatar-mask-icon.v-icon {
   font-size: 16px;
   top: -4px;
 }

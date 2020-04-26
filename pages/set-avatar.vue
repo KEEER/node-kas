@@ -60,7 +60,7 @@ export default {
 .input-file { display: none; }
 .upload-button { margin-bottom: 16px; }
 .preview-avatar {
-  border-radius: 50%;
+  border-radius: 4px;
   width: 128px;
   height: 128px;
   margin: 16px;

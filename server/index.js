@@ -68,7 +68,7 @@ config.dev = app.env !== 'production'
   }
   app.context.avatarFromName = name => {
     const { ALI_OSS_REGION, ALI_OSS_BUCKET, ALI_OSS_AVATAR_PREFIX } = process.env
-    return `https://${ALI_OSS_BUCKET}.${ALI_OSS_REGION}.aliyuncs.com/${ALI_OSS_AVATAR_PREFIX || ''}${name}`
+    return `https://${ALI_OSS_BUCKET}.${ALI_OSS_REGION}.aliyuncs.com/${ALI_OSS_AVATAR_PREFIX || ''}${name || 'default.svg'}`
   }
   app.context.createOrder = async function () {
     try {

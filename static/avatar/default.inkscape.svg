@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="48"
+   height="48"
+   viewBox="0 0 48 48"
+   version="1.1"
+   id="svg6"
+   sodipodi:docname="default.inkscape.svg"
+   inkscape:version="0.92.4 (33fec40, 2019-01-16)">
+  <metadata
+     id="metadata12">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs10" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1547"
+     inkscape:window-height="837"
+     id="namedview8"
+     showgrid="false"
+     inkscape:zoom="11.313709"
+     inkscape:cx="11.866695"
+     inkscape:cy="31.09783"
+     inkscape:window-x="53"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg6" />
+  <path
+     d="M 5.0902545e-4,47.996647 48.008537,48 c 0,0 7e-5,-38.0234853 7e-5,-47.9999296 C 48.008607,7.04e-5 13.840031,0 0,0 0,0 5.0902545e-4,34.155495 5.0902545e-4,47.996647 Z M 31.997918,16 c 0,4.426667 -3.586376,8 -7.999352,8 -4.412976,0 -7.999352,-3.573333 -7.999352,-8 0,-4.413333 3.586376,-8 7.999352,-8 4.412976,0 7.999352,3.586667 7.999352,8 z M 7.9998613,37.333333 c 0,-5.333333 10.6658027,-8.266666 15.9987047,-8.266666 5.332901,0 15.998705,2.933333 15.998705,8.266666 V 40 H 7.9998613 Z"
+     id="path2"
+     style="fill:#c2c7ca;fill-opacity:1"
+     inkscape:connector-curvature="0"
+     sodipodi:nodetypes="cccccssssssssccs" />
+  <path
+     d="M0 0h48v48H0z"
+     fill="none"
+     id="path4" />
+</svg>
