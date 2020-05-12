@@ -61,7 +61,7 @@
                 />
                 <v-row align="end" class="agree-terms">
                   <v-checkbox v-model="agreeTerms" hide-details />
-                  <span>我已阅读并同意<a href="/terms" target="_blank">用户协议和隐私政策</a></span>
+                  <span>我已阅读并同意<nuxt-link to="/kas-terms">用户协议和隐私政策</nuxt-link></span>
                 </v-row>
                 <v-btn type="submit" class="confirm-button" color="primary" :disabled="!signupValid || busy">注册</v-btn>
               </form>
@@ -71,7 +71,7 @@
       </div>
       <footer>
         <a href="https://keeer.net/" class="link"><img class="keeer-logo" src="https://keeer.net/img/logo/light-large.svg"></a>
-        <a href="/terms" class="link">用户协议与隐私政策</a>
+        <nuxt-link to="/kas-terms" class="link">用户协议与隐私政策</nuxt-link>
         <a href="/" class="link">联系我们</a>
         <a v-if="backgroundCopyright" :href="backgroundCopyrightUrl" class="link" target="_blank" rel="noopener">{{ backgroundCopyright }}</a>
       </footer>

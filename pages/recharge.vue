@@ -2,33 +2,33 @@
   <content>
     <v-btn icon color="primary" class="back" @click="$router.back()"><v-icon>mdi-arrow-left</v-icon></v-btn>
     <div class="content">
-      <h2 class="display-3 recharge-title">为 <span dir="ltr">{{ nickname || '新用户' }}</span> 充值信用点</h2>
+      <h2 class="display-3 recharge-title">为 <span dir="ltr">{{ nickname || '新用户' }}</span> 充值 Kredit </h2>
       <nuxt-link v-if="!nickname" to="/set-nickname">设置昵称</nuxt-link>
-      <p class="subtitle-1">充值信用点以享受 KEEER 提供的付费服务</p>
+      <p class="subtitle-1">充值 Kredit 以享受 KEEER 提供的付费服务</p>
       <p class="subtitle-2">
         请确保充值前您已经悉知并同意
-        <a href="/kredit-terms" class="link"><strong>Kredit 条款（点击以查看）</strong></a>，继续操作代表您已经同意该条款
+        <nuxt-link to="/kredit-terms" class="link"><strong>Kredit 条款（点击以查看）</strong></nuxt-link>，继续操作代表您已经同意该条款
       </p>
       <div class="card-container">
         <v-card class="option-card only-on-mobile" @click="recharge(2000)">
-          <p class="headline">充值 20 信用点</p>
+          <p class="headline">充值 20 Kredit</p>
           <p class="display-1">20 元</p>
         </v-card>
         <v-card class="option-card" @click="recharge(1024)">
-          <p class="headline">充值 10.24 信用点</p>
+          <p class="headline">充值 10.24 Kredit</p>
           <p class="display-1">10.24 元</p>
         </v-card>
         <v-card class="option-card" @click="recharge(500)">
-          <p class="headline">充值 5 信用点</p>
+          <p class="headline">充值 5 Kredit</p>
           <p class="display-1">5 元</p>
         </v-card>
         <v-card class="option-card" @click="recharge(100)">
-          <p class="headline">充值 1 信用点</p>
+          <p class="headline">充值 1 Kredit</p>
           <p class="display-1">1 元</p>
         </v-card>
         <v-card class="option-card custom">
           <p class="headline">自定义数额充值</p>
-          <p class="body-1">1 元 → 1 信用点</p>
+          <p class="body-1">1 元 → 1 Kredit</p>
           <div class="recharge-input-container">
             <div class="recharge-input">
               <v-text-field
@@ -52,7 +52,7 @@
     <footer>
       <p>
         <a href="https://keeer.net/" class="link"><img class="keeer-logo" src="https://keeer.net/img/logo/dark-large.svg"></a>
-        <a href="/terms" class="link">用户协议与隐私政策</a>
+        <nuxt-link to="/kas-terms" class="link">用户协议与隐私政策</nuxt-link>
         <a href="/" class="link">联系我们</a>
       </p>
       <p>Copyright © 2015-present KEEER. All rights reserved.</p>
@@ -101,7 +101,7 @@ export default {
       else this.$router.push(result)
     },
   },
-  head () { return { title: '充值信用点' } },
+  head () { return { title: '充值 Kredit ' } },
 }
 </script>
 

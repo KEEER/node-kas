@@ -25,8 +25,8 @@
         <settings-item v-if="!keeerId" title="设置 KEEER ID" to="/set-keeer-id" />
         <v-list-item v-else>您的 KEEER ID: {{ keeerId }}</v-list-item>
       </settings-group>
-      <settings-group title="信用点">
-        <v-list-item>您的信用点余额：{{ kredit / 100 }}</v-list-item>
+      <settings-group title="Kredit">
+        <v-list-item>您的 Kredit 余额：{{ kredit / 100 }}</v-list-item>
         <settings-item title="充值" to="/recharge" />
       </settings-group>
       <center><v-btn outlined color="error" @click="logout">退出登录</v-btn></center>

@@ -24,7 +24,7 @@ export default {
       amount,
       showBackButton: false,
       blur: false,
-      title: `充值 ${amount / 100} 信用点`,
+      title: `充值 ${amount / 100} Kredit`,
       destroyed: false,
     }
   },

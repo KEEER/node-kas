@@ -17,7 +17,7 @@ const sign = params => {
 
 const getMessage = (user, amount) => {
   const name = user.options.nickname || '新用户'
-  return `为 ${name.length > 10 ? name.substr(0, 10) + '…' : name} 充值 ${amount / 100} 信用点`
+  return `为 ${name.length > 10 ? name.substr(0, 10) + '…' : name} 充值 ${amount / 100} Kredit`
 }
 
 const checkAmount = amount => {

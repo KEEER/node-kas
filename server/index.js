@@ -190,8 +190,7 @@ config.dev = app.env !== 'production'
     const id = ctx.request.body.keeerId
     if (typeof id !== 'string') return ctx.body = INVALID_REQUEST
     if (!/^[a-zA-Z][0-9a-zA-Z_-]{1,31}$/.test(id)) return ctx.body = { status: 3, message: 'KEEER ID 包含非法字符' }
-    // this is vary rare so we can scan through all KEEER IDs without indexing
-    const res = await query('SELECT keeer_id FROM PRE_users WHERE LOWER(keeer_id) = LOWER($1);', [ id ])
+    const res = await query('SELECT keeer_id FROM PRE_users WHERE lower_keeer_id = LOWER($1);', [ id ])
     if (res.rows.length > 0) return ctx.body = { status: 4, message: '这个 KEEER ID 已被占用' }
     consola.log(`put:keeer-id user #${ctx.state.user.options.id} as ${id}`)
     ctx.state.user.options.keeerId = id
