@@ -305,7 +305,7 @@ config.dev = app.env !== 'production'
     const { token } = ctx.params
     const user = await User.fromToken(token)
     if (!user) return ctx.body = { status: 2, message: '这个用户不存在。', code: 'ENOTFOUND' }
-    return ctx.body = { status: 0, result: ctx.state.user.kiuid }
+    return ctx.body = { status: 0, result: user.options.kiuid }
   })
 
   // kredit
