@@ -386,7 +386,7 @@ config.dev = app.env !== 'production'
     if (type === 'kiuid') user = await User.fromKiuid(identity)
     if (!user) return ctx.body = { status: 2, message: '找不到用户', code: 'ENOTFOUND' }
     try {
-      await user.pay(amount, ctx.state.serviceId)
+      await user.pay(Number(amount), ctx.state.serviceId)
       consola.info(`Creating payment for service ${ctx.state.serviceId} and ${amount} centi-kredit`)
       return ctx.body = { status: 0 }
     } catch (e) {

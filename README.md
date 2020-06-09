@@ -31,6 +31,12 @@ Returns JSON if not otherwise stated:
 
 Please use the `code` to identify exceptions when possible, as status codes (except `0`) are non-informational and may subject to change.
 
+### `GET /api/status`
+Gets the status of the service.
+
+#### Responses
+- `{ status: 0 }`
+
 ### `POST /api/avatar`
 RL NC Multipart, Sets avatar    
 Form fields:
