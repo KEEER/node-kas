@@ -20,6 +20,7 @@
         @change="previewFile"
       >
       <input name="_csrf" type="hidden" :value="csrf">
+      <input name="frontend" type="hidden" value="true">
       <template v-if="valid">
         <h3>预览</h3>
         <img ref="preview" class="preview-avatar" src="" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjwvc3ZnPg=='">

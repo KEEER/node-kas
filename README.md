@@ -10,41 +10,73 @@ See `sql/init.sql` for the database structure.
 
 ## API
 
+> This documentation is generated partially by using the command: `node scripts/doc-responses`.
+
+### Terminology
+
 - RL: Requires Login (Cookies)
 - RA: Rate limit
 - RS: Requires Service (`Authorization: Bearer <token>` HTTP header)
-- NC: CSRF Token needed (See [CSRF section](#csrf))
+- NC: CSRF Token needed (See the [CSRF section](#csrf))
+
+### General rules
 
 Request should be `application/x-www-form-urlencoded` or `application/json` and `Content-Type` header should be set.
 
 Returns JSON if not otherwise stated:
 - `{"status":0,"message":"成功","result":"some result"}` - `0` indicates OK
-- `{"status":1,"message":"非法请求"}` - `1` indicates an invalid request
-- `{"status":-1,"message":"TypeError: Cannot convert null or undefined to object"}` - `-1` indicates an unknown error
-- `{"status":-2,"message":"您尚未登录"}` - `-2` indicates unauthorized
+- `{"status":1,"message":"非法请求","code":"EINVALID_REQUEST"}` - `1` indicates an invalid request
+- `{"status":-1,"message":"TypeError: Cannot convert null or undefined to object","code":"EUNKNOWN"}` - `-1` indicates an unknown error
+- `{"status":-2,"message":"您尚未登录","code":"EUNAUTHORIZED"}` - `-2` indicates unauthorized
+
+Please use the `code` to identify exceptions when possible, as status codes (except `0`) are non-informational and may subject to change.
 
 ### `POST /api/avatar`
 RL NC Multipart, Sets avatar    
 Form fields:
 - `_csrf`
+- `frontend` = `true` if is a frontend request (see below); else do not present this field (or leave blank)
 - `avatar:file` avatar file
 
-Returns: redirect to home page (302) if success; else message as plain text
+Returns: 
+- Frontend request: redirect to home page (302) if success; else message as plain text
+- Else: see below.
+
+#### Responses
+- `{ status: 0 }`
+- `{ status: 2, message: 'Not an image', code: 'ENOT_IMAGE' }`
+- `{ status: 3, message: 'Image too large', code: 'ETOO_LARGE' }`
 
 ### `PUT /api/email`
 RL RA(1min), Sends verification email    
 Form fields:
 - `email:string` email address
 
+#### Responses
+- `{ status: 0, message: '验证码已发送，请查收。' }`
+- `{ status: 2, message: '这个地址已经被其他账户绑定。', code: 'ETAKEN' }`
+- `{ status: 3, message: '操作过于频繁，请过一分钟后再试', code: 'EABUSE' }`
+- `{ status: 4, message: '邮件地址不正确', code: 'EINVALID_ADDRESS' }`
+- `{ status: 5, message: '暂时无法发送邮件', code: 'ESEND' }`
+
 ### `PUT /api/keeer-id`
 RL, Sets KEEER ID    
 Form fields:
 - `id:string` KEEER ID
 
+#### Responses
+- `{ status: 0, message: '成功设置 KEEER ID' }`
+- `{ status: 3, message: 'KEEER ID 包含非法字符', code: 'EINVALID_ID' }`
+- `{ status: 4, message: '这个 KEEER ID 已被占用', code: 'EDUPLICATE' }`
+
 ### `PUT /api/nickname`
 RL, Sets nickname    
 Form fields:
 - `nickname:string` Nickname
+
+#### Responses
+- `{ status: 0, message: '成功修改昵称' }`
+- `{ status: 2, message: '昵称过长', code: 'ETOO_LONG' }`
 
 ### `PUT /api/password`
 Sets or finds back password
@@ -60,11 +92,25 @@ Form fields:
 - `code:string` Verification code
 - `password:string` New password
 
+#### Responses
+- `{ status: 0, message: '成功重置密码' }`
+- `{ status: 0, message: '成功修改密码' }`
+- `{ status: 2, message: '密码不符合要求', code: 'EINVALID_PASSWORD' }`
+- `{ status: 3, message: '验证码错误', code: 'EBAD_TOKEN' }`
+- `{ status: 4, message: '手机号不正确', code: 'EINVALID_PHONE_NUMBER' }`
+- `{ status: 5, message: '密码错误', code: 'EBAD_PASSWORD' }`
+
 ### `PUT /api/phone-number`
 RL, Sets phone number    
 Form fields:
 - `number:string` Phone number
 - `code:string` Verification code
+
+#### Responses
+- `{ status: 0, message: '成功设置手机号' }`
+- `{ status: 2, message: '密码错误', code: 'EBAD_PASSWORD' }`
+- `{ status: 3, message: '验证码不正确', code: 'EBAD_TOKEN' }`
+- `{ status: 4, message: '手机号不正确', code: 'EINVALID_PHONE_NUMBER' }`
 
 ### `PUT /api/sms-code`
 RA(1min), Sends SMS.    
@@ -77,6 +123,14 @@ Types:
 - `SMS_TYPE_FIND_BACK_PASSWORD` Find back password
 - `SMS_TYPE_SET_PHONE_NUMBER` RL, Sets new phone number
 
+#### Responses
+- `{ status: 0, message: '验证码已发送，请查收。' }`
+- `{ status: 2, message: '您已经注册。', code: 'EDUPLICATE' }`
+- `{ status: 2, message: '您尚未注册。', code: 'ENOTFOUND' }`
+- `{ status: 3, message: '操作过于频繁，请过一分钟后再试', code: 'EABUSE' }`
+- `{ status: 4, message: '手机号不正确', code: 'EINVALID_PHONE_NUMBER' }`
+- `{ status: 5, message: '暂时无法发送短信', code: 'ESEND' }`
+
 ### `GET /api/user-information`
 RL, Gets user information    
 Returns:
@@ -85,23 +139,42 @@ Returns:
 - `keeerId:string?` KEEER ID
 - `kredit:int` Centi-kredit
 
+#### Responses
+- `{ status: 0, result: { avatar, nickname, keeerId, kredit } }`
+
 ### `GET /api/login-config?service=<service name>`
 Gets login UI config for the designated service    
 Returns: `{ title, logoSrc, backgroundUrl, themeColor, redirectUrl, backgroundCopyright, backgroundCopyrightUrl }`
+
+#### Responses
+- `{ status: 0, result: cfg }`
+- `{ status: 0, result: false }`: indicates no configuration in the service
 
 ### `GET /api/<login token>/kiuid`
 RS, Gets KIUID of the token.    
 Returns `:string` KIUID
 
+#### Responses
+- `{ status: 0, result: user.options.kiuid }`
+- `{ status: 2, message: '这个用户不存在。', code: 'ENOTFOUND' }`
+
 ### `GET /api/recharge-order?id=<order ID>[&watch=true]`
 RL, Gets [ and watches ] a recharge order    
-Returns `:boolean` true if completed    
-Throws `{"status":127,"code":"ETIMEOUT"}`
+Returns `:boolean` true if completed
+
+#### Responses
+- `{ status: 0, result: state }`
+- `{ status: 0, result: await createLongPoll(id) }`
+- `{ status: 2, message: '订单不存在', code: 'ENOTFOUND' }`
+- `{ status: 127, message: '超时', code: 'ETIMEOUT' }`
 
 ### `PUT /api/recharge-order`
 RL, Creates recharge order    
 Form fields:
 - `amount:number` Cents
+
+#### Responses
+- `{ status: 0, result: '/recharge-cashier?' + search }`
 
 ### `POST /api/pay`
 RS, Makes payment    
@@ -116,17 +189,27 @@ Identity types:
 - `keeer-id` or `keeerId`
 - `kiuid`
 
-Throws: 
-- `{"status":3,"code":"EINVALID_AMOUNT"}` Invalid amount
-- `{"status":4,"code":"EINSUFFICIENT_KREDIT"}` User has insufficient kredit
+#### Responses
+- `{ status: 0 }`
+- `{ status: 2, message: '找不到用户', code: 'ENOTFOUND' }`
+- `{ status: 3, message: String(e), code: 'EINVALID_AMOUNT' }` Invalid amount
+- `{ status: 4, message: '余额不足', code: 'EINSUFFICIENT_KREDIT' }` User has insufficient kredit
 
 ### `PUT /api/token[?set-cookie=true]`
 Logs in (i.e. creates a token) [ and sets the token in response header ].    
 Headers:
 - `Authorization: basic <credentials>` where credentials is base64(identity ':' password)
 
+#### Responses
+- `{ status: 0, message: '登录成功', result: token }`
+- `{ status: 2, message: '用户名或密码错误', code: 'EBAD_CREDENTIALS' }`
+
 ### `DELETE /api/token/<token?>[?set-cookie=true]`
 Log out (i.e. destroys the token in URL or cookies) [ and removes cookies ].
+
+#### Responses
+- `{ status: 0, message: '退出登录成功' }`
+- `{ status: 2, message: '已失效的登录', code: 'ENOTFOUND' }`
 
 ### `PUT /api/user[?set-cookie=true]`
 Signs up (i.e. creates a new user) [ and sets token cookie in response header ]    
@@ -134,6 +217,13 @@ Form fields:
 - `number:string` Phone number
 - `code:string` Verification code
 - `password:string` Password
+
+#### Responses
+- `{ status: 0, message: '您已经成功注册！', result: token }`
+- `{ status: 2, message: '密码不符合要求', code: 'EINVALID_PASSWORD' }`
+- `{ status: 3, message: '验证码错误', code: 'EBAD_TOKEN' }`
+- `{ status: 4, message: '手机号不正确', code: 'EINVALID_PHONE_NUMBER' }`
+- `{ status: 5, message: '您已经注册，请直接登录或找回密码', code: 'EDUPLICATE' }`
 
 ## CSRF
 Set a cookie named `_csrf` with a random value, and submit this random value in a form field called `_csrf`.

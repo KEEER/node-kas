@@ -53,14 +53,14 @@ config.dev = app.env !== 'production'
   // misc
   const validateCsrf = (ctx, token) => token === ctx.cookies.get('_csrf')
   const requireLogin = (ctx, next) => {
-    if (!ctx.state.user) return ctx.body = { status: -2, message: '您没有登录' }
+    if (!ctx.state.user) return ctx.body = { status: -2, message: '您没有登录', code: 'EUNAUTHORIZED' }
     return next()
   }
   const requireService = async (ctx, next) => {
     if (ctx.state.serviceId === null) ctx.throw(401)
     await next()
   }
-  const INVALID_REQUEST = { status: 1, message: '非法请求' }
+  const INVALID_REQUEST = { status: 1, message: '非法请求', code: 'EINVALID_REQUEST' }
   app.context.getServiceLoginConfig = async name => {
     const res = await query('SELECT login_prefs FROM PRE_services WHERE name = $1;', [ name ])
     if (res.rows.length < 1) return null
@@ -78,10 +78,10 @@ config.dev = app.env !== 'production'
       if (e && e.code === 'EINVALID_AMOUNT') return INVALID_REQUEST
       if (e && e.code === 'EPAYJS_FAILED') {
         consola.warn(e)
-        return { status: 2, message: '无法发起支付' }
+        return { status: 2, message: '无法发起支付', code: 'EPAYJS_FAILED' }
       }
       consola.warn(e)
-      return { status: -1, message: String(e) }
+      return { status: -1, message: String(e), code: (e && e.code) || 'EUNKNOWN' }
     }
   }
   app.context.createCashierOrder = async function () {
@@ -91,30 +91,32 @@ config.dev = app.env !== 'production'
     } catch (e) {
       if (e && e.code === 'EINVALID_AMOUNT') return INVALID_REQUEST
       consola.warn(e)
-      return { status: -1, message: String(e) }
+      return { status: -1, message: String(e), code: (e && e.code) || 'EUNKNOWN' }
     }
   }
   app.context.isMobile = function () {
     const regexp = /(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i
     return regexp.test(this.get('User-Agent'))
   }
-  router.all('/api/*', async (ctx, next) => {
+  router/* nodoc */.all('/api/*', async (ctx, next) => {
     try {
       await next()
     } catch (e) {
       console.warn(e)
-      if (!ctx.body) ctx.body = { status: -1, message: String(e) }
+      if (!ctx.body) ctx.body = { status: -1, message: String(e), code: (e && e.code) || 'EUNKNOWN' }
       throw e
     }
   })
+  router/* nodoc */.get('/api/status', ctx => ctx.body = { status: 0 })
 
   // set props
   router.post('/api/avatar', requireLogin, async ctx => {
     if (!validateCsrf(ctx, ctx.request.body._csrf)) return ctx.body = 'Invalid CSRF'
     const user = ctx.state.user
+    const frontend = ctx.request.body.frontend
     const { size, path, type, name: filename } = ctx.request.files.avatar
-    if (!type.startsWith('image/')) return ctx.body = 'Not an image'
-    if (size > 5 * 1024 * 1024) return ctx.body = 'Too large'
+    if (!type.startsWith('image/')) return ctx.body = frontend ? 'Not an image' : { status: 2, message: 'Not an image', code: 'ENOT_IMAGE' }
+    if (size > 5 * 1024 * 1024) return ctx.body = frontend ? 'Image too large' : { status: 3, message: 'Image too large', code: 'ETOO_LARGE' }
     const uid = user.options.id
     const ext = filename.split('.').pop()
     const name = `${uid}-${(await randomBytes(16)).toString('hex')}.${ext}`
@@ -141,7 +143,8 @@ config.dev = app.env !== 'production'
     }
     user.options.avatarName = name
     await user.update()
-    ctx.redirect('/')
+    if (frontend) return ctx.redirect('/')
+    else return ctx.body = { status: 0 }
   })
   router.put('/api/email', requireLogin, async ctx => {
     const params = ctx.request.body
@@ -150,18 +153,18 @@ config.dev = app.env !== 'production'
     if (!email) return ctx.body = INVALID_REQUEST
     try {
       const user = await User.fromEmail(email)
-      if (user) return ctx.body = { status: 2, message: '这个地址已经被其他账户绑定。' }
+      if (user) return ctx.body = { status: 2, message: '这个地址已经被其他账户绑定。', code: 'ETAKEN' }
       await sendEmailVerification(email, EMAIL_TYPES.EMAIL_TYPE_SET_VERIFICATION, ctx.state.user)
       return ctx.body = { status: 0, message: '验证码已发送，请查收。' }
     } catch (e) {
-      if (e.code === 'ECOOLING_PERIOD') return ctx.body = { status: 3, message: '操作过于频繁，请过一分钟后再试' }
-      if (e.code === 'EINVALID_EMAIL_ADDRESS') return ctx.body = { status: 4, message: '邮件地址不正确' }
+      if (e.code === 'ECOOLING_PERIOD') return ctx.body = { status: 3, message: '操作过于频繁，请过一分钟后再试', code: 'EABUSE' }
+      if (e.code === 'EINVALID_EMAIL_ADDRESS') return ctx.body = { status: 4, message: '邮件地址不正确', code: 'EINVALID_ADDRESS' }
       if (e.code === 'EEMAIL_SEND_ERROR') {
         consola.warn(e)
-        return ctx.body = { status: 5, message: '暂时无法发送邮件' }
+        return ctx.body = { status: 5, message: '暂时无法发送邮件', code: 'ESEND' }
       }
       consola.error(e)
-      return ctx.body = { status: -1, message: String(e) }
+      return ctx.body = { status: -1, message: String(e), code: (e && e.code) || 'EUNKNOWN' }
     }
   })
   router.get('/confirm-email', async ctx => {
@@ -186,12 +189,14 @@ config.dev = app.env !== 'production'
     if (ctx.state.user.options.keeerId) return ctx.body = {
       status: 2,
       message: `您已经设置您的 KEEER ID 为 ${ctx.state.user.options.keeerId}，无法修改`,
+      code: 'EID_ALREADY_SET',
+      keeerId: ctx.state.user.options.keeerId,
     }
     const id = ctx.request.body.keeerId
     if (typeof id !== 'string') return ctx.body = INVALID_REQUEST
-    if (!/^[a-zA-Z][0-9a-zA-Z_-]{1,31}$/.test(id)) return ctx.body = { status: 3, message: 'KEEER ID 包含非法字符' }
+    if (!/^[a-zA-Z][0-9a-zA-Z_-]{1,31}$/.test(id)) return ctx.body = { status: 3, message: 'KEEER ID 包含非法字符', code: 'EINVALID_ID' }
     const res = await query('SELECT keeer_id FROM PRE_users WHERE lower_keeer_id = LOWER($1);', [ id ])
-    if (res.rows.length > 0) return ctx.body = { status: 4, message: '这个 KEEER ID 已被占用' }
+    if (res.rows.length > 0) return ctx.body = { status: 4, message: '这个 KEEER ID 已被占用', code: 'EDUPLICATE' }
     consola.log(`put:keeer-id user #${ctx.state.user.options.id} as ${id}`)
     ctx.state.user.options.keeerId = id
     await ctx.state.user.update()
@@ -200,7 +205,7 @@ config.dev = app.env !== 'production'
   router.put('/api/nickname', requireLogin, async ctx => {
     const nickname = ctx.request.body.nickname
     if (typeof nickname !== 'string') return ctx.body = INVALID_REQUEST
-    if (nickname.length > 64) return ctx.body = { status: 2, message: '昵称过长' }
+    if (nickname.length > 64) return ctx.body = { status: 2, message: '昵称过长', code: 'ETOO_LONG' }
     consola.log(`put:nickname user #${ctx.state.user.options.id} as ${nickname}`)
     ctx.state.user.options.nickname = nickname
     await ctx.state.user.update()
@@ -211,7 +216,7 @@ config.dev = app.env !== 'production'
     if (typeof params !== 'object' || !params) return ctx.body = INVALID_REQUEST
     const { current, code, number, password } = params
     if (((!code || !number) && !current) || (code && current) || !password) return ctx.body = INVALID_REQUEST
-    if (!/^[\x21-\x7E]{6,32}$/.test(password)) return ctx.body = { status: 2, message: '密码不符合要求' }
+    if (!/^[\x21-\x7E]{6,32}$/.test(password)) return ctx.body = { status: 2, message: '密码不符合要求', code: 'EINVALID_PASSWORD' }
     if (code) { // find back
       const user = await User.fromPhoneNumber(number)
       try {
@@ -219,17 +224,17 @@ config.dev = app.env !== 'production'
           consola.log(`put:password user #${user.options.id}`)
           await user.setPassword(password)
           return ctx.body = { status: 0, message: '成功重置密码' }
-        } else return ctx.body = { status: 3, message: '验证码错误' }
+        } else return ctx.body = { status: 3, message: '验证码错误', code: 'EBAD_TOKEN' }
       } catch (e) {
-        if (e.code === 'EINVALID_PHONE_NUMBER') return ctx.body = { status: 4, message: '手机号不正确' }
+        if (e.code === 'EINVALID_PHONE_NUMBER') return ctx.body = { status: 4, message: '手机号不正确', code: e.code }
         consola.error(e)
-        return ctx.body = { status: -1, message: String(e) }
+        return ctx.body = { status: -1, message: String(e), code: (e && e.code) || 'EUNKNOWN' }
       }
     } else if (ctx.state.user.passwordMatches(current)) { // set
       await ctx.state.user.setPassword(password)
       return ctx.body = { status: 0, message: '成功修改密码' }
     } else {
-      return ctx.body = { status: 5, message: '密码错误' }
+      return ctx.body = { status: 5, message: '密码错误', code: 'EBAD_PASSWORD' }
     }
   })
   router.put('/api/phone-number', requireLogin, async ctx => {
@@ -237,18 +242,18 @@ config.dev = app.env !== 'production'
     const user = ctx.state.user
     if (typeof params !== 'object' || !params) return ctx.body = INVALID_REQUEST
     const { number: numberIn, code, password } = params
-    if (!user.passwordMatches(password)) return ctx.body = { status: 2, message: '密码错误' }
+    if (!user.passwordMatches(password)) return ctx.body = { status: 2, message: '密码错误', code: 'EBAD_PASSWORD' }
     try {
       const number = checkNumber(numberIn)
       if (await checkSmsVerificationCode(number, code, SMS_TYPES.SMS_TYPE_SET_PHONE_NUMBER, user)) {
         user.options.phoneNumber = number
         await user.update()
         return ctx.body = { status: 0, message: '成功设置手机号' }
-      } else return ctx.body = { status: 3, message: '验证码不正确' }
+      } else return ctx.body = { status: 3, message: '验证码不正确', code: 'EBAD_TOKEN' }
     } catch (e) {
-      if (e.code === 'EINVALID_PHONE_NUMBER') return ctx.body = { status: 4, message: '手机号不正确' }
+      if (e.code === 'EINVALID_PHONE_NUMBER') return ctx.body = { status: 4, message: '手机号不正确', code: e.code }
       consola.error(e)
-      return ctx.body = { status: -1, message: String(e) }
+      return ctx.body = { status: -1, message: String(e), code: (e && e.code) || 'EUNKNOWN' }
     }
   })
 
@@ -267,18 +272,18 @@ config.dev = app.env !== 'production'
       if (
         (type === SMS_TYPES.SMS_TYPE_REGISTER && user) ||
         (type === SMS_TYPES.SMS_TYPE_FIND_BACK_PASSWORD && !user)
-      ) return ctx.body = { status: 2, message: `您${user ? '已经' : '尚未'}注册。` }
+      ) return ctx.body = { status: 2, message: `您${user ? '已经' : '尚未'}注册。`, code: user ? 'EDUPLICATE' : 'ENOTFOUND' }
       await sendSmsVerificationCode(number, type, user)
       return ctx.body = { status: 0, message: '验证码已发送，请查收。' }
     } catch (e) {
-      if (e.code === 'ECOOLING_PERIOD') return ctx.body = { status: 3, message: '操作过于频繁，请过一分钟后再试' }
-      if (e.code === 'EINVALID_PHONE_NUMBER') return ctx.body = { status: 4, message: '手机号不正确' }
+      if (e.code === 'ECOOLING_PERIOD') return ctx.body = { status: 3, message: '操作过于频繁，请过一分钟后再试', code: 'EABUSE' }
+      if (e.code === 'EINVALID_PHONE_NUMBER') return ctx.body = { status: 4, message: '手机号不正确', code: e.code }
       if (e.code === 'ESMS_SEND_ERROR') {
         consola.warn(e)
-        return ctx.body = { status: 5, message: '暂时无法发送短信' }
+        return ctx.body = { status: 5, message: '暂时无法发送短信', code: 'ESEND' }
       }
       consola.error(e)
-      return ctx.body = { status: -1, message: String(e) }
+      return ctx.body = { status: -1, message: String(e), code: (e && e.code) || 'EUNKNOWN' }
     }
   })
 
@@ -337,10 +342,10 @@ config.dev = app.env !== 'production'
       if (!isLongPoll || state) return ctx.body = { status: 0, result: state }
       else return ctx.body = { status: 0, result: await createLongPoll(id) }
     } catch (e) {
-      if (e.code === 'ENOTFOUND') return ctx.body = { status: 2, message: '订单不存在' }
+      if (e.code === 'ENOTFOUND') return ctx.body = { status: 2, message: '订单不存在', code: 'ENOTFOUND' }
       if (e.code === 'ETIMEOUT') return ctx.body = { status: 127, message: '超时', code: 'ETIMEOUT' }
       consola.warn(e)
-      ctx.body = { status: -1, message: String(e) }
+      ctx.body = { status: -1, message: String(e), code: (e && e.code) || 'EUNKNOWN' }
     }
   })
   router.put('/api/recharge-order', requireLogin, async ctx => {
@@ -359,7 +364,7 @@ config.dev = app.env !== 'production'
     consola.info(`received payjs callback for #${id}`)
     if (!id) {
       consola.warn('Payjs callback Failed!')
-      return ctx.body = { status: -1 }
+      return ctx.body = { status: -1, code: 'EINTERNAL' }
     }
     const set = polls.get(id)
     if (set) {
@@ -407,7 +412,7 @@ config.dev = app.env !== 'production'
     if (!credMatch || !credMatch[1] || !credMatch[2]) return ctx.body = INVALID_REQUEST
     const [ , identity, password ] = credMatch
     const user = await User.login(identity, password)
-    if (!user) return ctx.body = { status: 2, message: '用户名或密码错误' }
+    if (!user) return ctx.body = { status: 2, message: '用户名或密码错误', code: 'EBAD_CREDENTIALS' }
     const token = await user.createToken()
     if (ctx.query['set-cookie']) setTokenCookie(ctx, token)
     return ctx.body = { status: 0, message: '登录成功', result: token }
@@ -416,7 +421,7 @@ config.dev = app.env !== 'production'
     const token = ctx.params.token || ctx.cookies.get(process.env.TOKEN_COOKIE_NAME)
     if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(token)) return ctx.body = INVALID_REQUEST
     const res = await query('DELETE FROM PRE_tokens WHERE token = $1;', [ token ])
-    if (res.rowCount < 1) return ctx.body = { status: 2, message: '已失效的登录' }
+    if (res.rowCount < 1) return ctx.body = { status: 2, message: '已失效的登录', code: 'ENOTFOUND' }
     if (ctx.query['set-cookie']) setTokenCookie(ctx, '', 0)
     return ctx.body = { status: 0, message: '退出登录成功' }
   })
@@ -425,21 +430,21 @@ config.dev = app.env !== 'production'
     if (typeof params !== 'object' || !params) return ctx.body = INVALID_REQUEST
     const { number: numberIn, code, password } = params
     if (!numberIn || !code || !password) return ctx.body = INVALID_REQUEST
-    if (!/^[\x21-\x7E]{6,32}$/.test(password)) return ctx.body = { status: 2, message: '密码不符合要求' }
+    if (!/^[\x21-\x7E]{6,32}$/.test(password)) return ctx.body = { status: 2, message: '密码不符合要求', code: 'EINVALID_PASSWORD' }
     try {
       const number = checkNumber(numberIn)
       const dupRes = await query('SELECT phone_number FROM PRE_users WHERE phone_number = $1;', [ number ])
-      if (dupRes.rows.length > 0) return ctx.body = { status: 5, message: '您已经注册，请直接登录或找回密码' }
+      if (dupRes.rows.length > 0) return ctx.body = { status: 5, message: '您已经注册，请直接登录或找回密码', code: 'EDUPLICATE' }
       if (await checkSmsVerificationCode(number, code, SMS_TYPES.SMS_TYPE_REGISTER)) {
         const user = await User.create(number, password)
         const token = await user.createToken()
         if (ctx.query['set-cookie']) setTokenCookie(ctx, token)
         return ctx.body = { status: 0, message: '您已经成功注册！', result: token }
-      } else return ctx.body = { status: 3, message: '验证码错误' }
+      } else return ctx.body = { status: 3, message: '验证码错误', code: 'EBAD_TOKEN' }
     } catch (e) {
-      if (e.code === 'EINVALID_PHONE_NUMBER') return ctx.body = { status: 4, message: '手机号不正确' }
+      if (e.code === 'EINVALID_PHONE_NUMBER') return ctx.body = { status: 4, message: '手机号不正确', code: e.code }
       consola.error(e)
-      return ctx.body = { status: -1, message: String(e) }
+      return ctx.body = { status: -1, message: String(e), code: (e && e.code) || 'EUNKNOWN' }
     }
   })
 
