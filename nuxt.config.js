@@ -55,16 +55,29 @@ module.exports = {
     optimization: {
       splitChunks: {
         cacheGroups: {
-          styles: {
-            name: 'styles',
-            test: /\.(css|vue)$/,
-            chunks: 'all',
-            enforce: true,
+          pages: {
+            name: 'pages',
+            test: /pages/,
+          },
+          login: {
+            name: 'login',
+            test: /login/,
+            priority: 5,
           },
         },
       },
     },
     publicPath,
+    filenames: {
+      app: ({ isDev }) => isDev ? '[name].js' : 'main.[contenthash].js',
+      chunk: ({ isDev }) => isDev ? '[name].js' : '[name].[contenthash].js',
+      css: ({ isDev }) => isDev ? '[name].css' : '[name].[contenthash].css',
+    },
+    extend (config, { isClient }) {
+      if (isClient) {
+        config.optimization.splitChunks.cacheGroups.commons.automaticNameDelimiter = '-'
+      }
+    },
   },
   buildModules: [
     '@nuxtjs/eslint-module',
