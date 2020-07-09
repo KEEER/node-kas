@@ -9,7 +9,7 @@
           <v-list-item-action>
             <div class="avatar-editable">
               <div class="avatar-wrapper">
-                <img class="avatar-img" :src="avatar" aria-hidden="true" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjwvc3ZnPg=='">
+                <img ref="avatarImg" class="avatar-img" :src="avatar" aria-hidden="true">
               </div>
               <div class="avatar-mask">
                 <v-icon color="#f5fafd" class="avatar-mask-icon">mdi-pencil</v-icon>
@@ -73,6 +73,9 @@ export default {
   },
   created () {
     if (this.notLoggedIn) this.$router.push('/login')
+  },
+  mounted () {
+    this.$refs.avatarImg.onerror = () => this.$refs.avatarImg.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjwvc3ZnPg=='
   },
   methods: {
     async logout () {

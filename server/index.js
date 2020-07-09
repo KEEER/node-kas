@@ -20,22 +20,20 @@ const app = new Koa()
 const config = require('../nuxt.config.js') // eslint-disable-line import/order
 config.dev = app.env !== 'production'
 
-{
-  const logger = winston.createLogger({
-    level: 'info',
-    format: winston.format.combine(
-      winston.format.timestamp(),
-      winston.format.errors({ stack: true }),
-      winston.format.splat(),
-      winston.format.json(),
-    ),
-    transports: [
-      new winston.transports.File({ filename: 'error.log', level: 'error' }),
-      new winston.transports.File({ filename: 'verbose.log', level: 'verbose' }),
-    ],
-  })
-  consola._reporters.push(new consola.WinstonReporter(logger))
-}
+const winstonLogger = winston.createLogger({
+  level: 'info',
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.errors({ stack: true }),
+    winston.format.splat(),
+    winston.format.json(),
+  ),
+  transports: [
+    new winston.transports.File({ filename: 'error.log', level: 'error' }),
+    new winston.transports.File({ filename: 'verbose.log', level: 'verbose' }),
+  ],
+})
+consola._reporters.push(new consola.WinstonReporter(winstonLogger))
 
 ;(async () => {
   const nuxt = new Nuxt(config)
@@ -289,7 +287,7 @@ config.dev = app.env !== 'production'
 
   // queries
   router.get('/api/user-information', requireLogin, ctx => {
-    if (/^https?:\/\/[^.]+\.keeer.net/.test(ctx.get('origin'))) {
+    if (/^https?:\/\/[^.]+\.keeer.net$/.test(ctx.get('origin'))) {
       ctx.set('Access-Control-Allow-Origin', ctx.get('origin'))
       ctx.set('Vary', 'Origin')
       ctx.set('Access-Control-Allow-Credentials', 'true')
@@ -447,6 +445,11 @@ config.dev = app.env !== 'production'
       return ctx.body = { status: -1, message: String(e), code: (e && e.code) || 'EUNKNOWN' }
     }
   })
+  router.post('/csp-vio', ctx => {
+    consola.info('sec:csp caught a violation!')
+    winstonLogger.warn(ctx.request.body)
+    return ctx.body = 'Thank you for reporting a CSP violation!'
+  })
 
   app.use(koaWinston.logger({
     transports: new winston.transports.File({ filename: 'access.log' }),
@@ -463,6 +466,11 @@ config.dev = app.env !== 'production'
     const res = await query('SELECT id FROM PRE_services WHERE token = $1;', [ token ])
     if (res.rows.length === 0) return await next()
     ctx.state.serviceId = res.rows[0].id
+    return await next()
+  })
+  app.use(async (ctx, next) => { // common headers
+    ctx.set('X-Frame-Options', 'SAMEORIGIN')
+    ctx.set('X-Powered-By', 'KEEER Account System v4/1.0.1')
     return await next()
   })
   app.use(async (ctx, next) => {

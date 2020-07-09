@@ -2,6 +2,8 @@ require('dotenv').config()
 
 const { ALI_OSS_REGION, ALI_OSS_BUCKET, ALI_OSS_ASSETS_PREFIX } = process.env
 let publicPath = `https://${ALI_OSS_BUCKET}.${ALI_OSS_REGION}.aliyuncs.com/${ALI_OSS_ASSETS_PREFIX || ''}`
+const cdnOrigin = `https://${ALI_OSS_BUCKET}.${ALI_OSS_REGION}.aliyuncs.com`
+const jsdelivr = 'https://cdn.jsdelivr.net'
 if (!ALI_OSS_BUCKET || !ALI_OSS_REGION) publicPath = '/_nuxt/'
 if (process.env.NODE_ENV !== 'production') publicPath = '/_nuxt/'
 
@@ -17,8 +19,35 @@ module.exports = {
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+      {
+        rel: 'stylesheet',
+        type: 'text/css',
+        href: 'https://cdn.jsdelivr.net/npm/@mdi/font@5.3.45/css/materialdesignicons.min.css',
+        integrity: 'sha256-nwNjrH7J9zS/Ti4twtWX7OsC5QdQHCIKTv5cLMsGo68=',
+        crossorigin: 'anonymous',
+      },
     ],
     htmlAttrs: { lang: 'zh-CN' },
+  },
+  render: {
+    csp: {
+      reportOnly: false,
+      hashAlgorithm: 'sha256',
+      policies: {
+        'default-src': [ '\'self\'', cdnOrigin, '\'report-sample\'' ],
+        'img-src': [ '\'self\'', 'data:', jsdelivr, `https://*.${ALI_OSS_REGION}.aliyuncs.com`, 'https://keeer.net', 'https://*.keeer.net' ],
+        'script-src': [
+          '\'self\'', cdnOrigin, jsdelivr, 'https://idframe.keeer.net', '\'report-sample\'',
+          ...(process.env.NODE_ENV === 'development' ? [ '\'unsafe-eval\'' ] : []),
+        ],
+        'style-src': [ '\'self\'', jsdelivr, cdnOrigin, '\'unsafe-inline\'', '\'report-sample\'' ],
+        'font-src': [ '\'self\'', jsdelivr, cdnOrigin, '\'report-sample\'' ],
+        'object-src': [ '\'none\'', '\'report-sample\'' ],
+        'form-action': [ '\'self\'', '\'report-sample\'' ],
+        'frame-ancestors': [ '\'self\'' ],
+        'report-uri': [ '/csp-vio' ],
+      },
+    },
   },
   loading: { color: '#f5fafd' },
   build: {
@@ -60,7 +89,7 @@ module.exports = {
     },
     defaultAssets: {
       font: false,
-      icons: 'mdi',
+      icons: false,
     },
   },
 }

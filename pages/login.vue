@@ -111,8 +111,8 @@ export default {
       busy: false,
       title: '登录您的 KEEER 账户',
       logoSrc: 'https://keeer.net/img/logo/light-square.jpg',
-      backgroundUrl: 'https://nodekas-production.oss-cn-beijing.aliyuncs.com/assets/login-background.webp',
-      backgroundCopyright: '背景图片-CC BY-SA 4.0',
+      backgroundUrl: 'https://nodekas-production.oss-cn-beijing.aliyuncs.com/assets/login-background.jpg',
+      backgroundCopyright: '背景图片：CC BY-SA 4.0',
       backgroundCopyrightUrl: 'https://commons.wikimedia.org/wiki/File:Ellerberg_1274451.jpg',
       customLogo: false,
     }

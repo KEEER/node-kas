@@ -1,6 +1,6 @@
 {
   "name": "node-kas",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A drop-in replacement for KAS.",
   "author": "Alan-Liang",
   "private": true,
