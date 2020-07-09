@@ -36,6 +36,7 @@ export default {
       type: Function,
       required: false,
     },
+    track: String,
   },
   data () {
     return { submitting: false }
@@ -70,6 +71,7 @@ export default {
     back () { this.$router.back() },
     async submit () {
       if (!this.valid) return
+      if (this.track) this.$ga.event('set', this.track)
       try {
         this.submitting = true
         const res = await fetch(this.putPath, {

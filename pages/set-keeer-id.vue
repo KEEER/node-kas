@@ -3,6 +3,7 @@
     title="设置您的KEEER ID"
     subtitle="请慎重，您仅有 1 次设置机会"
     put-path="/api/keeer-id"
+    track="keeer-id"
     :get-data="() => ({ keeerId: id })"
     :validate="() => !!id && id.length < 32"
   >

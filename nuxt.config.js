@@ -35,14 +35,14 @@ module.exports = {
       hashAlgorithm: 'sha256',
       policies: {
         'default-src': [ '\'self\'', cdnOrigin, '\'report-sample\'' ],
-        'img-src': [ '\'self\'', 'data:', jsdelivr, `https://*.${ALI_OSS_REGION}.aliyuncs.com`, 'https://keeer.net', 'https://*.keeer.net' ],
+        'img-src': [ '\'self\'', 'data:', jsdelivr, `https://*.${ALI_OSS_REGION}.aliyuncs.com`, 'https://keeer.net', 'https://*.keeer.net', 'https://www.google-analytics.com' ],
         'script-src': [
-          '\'self\'', cdnOrigin, jsdelivr, 'https://idframe.keeer.net', '\'report-sample\'',
+          '\'self\'', cdnOrigin, jsdelivr, 'https://idframe.keeer.net', 'https://www.google-analytics.com', '\'report-sample\'',
           ...(process.env.NODE_ENV === 'development' ? [ '\'unsafe-eval\'' ] : []),
         ],
         'style-src': [ '\'self\'', jsdelivr, cdnOrigin, '\'unsafe-inline\'', '\'report-sample\'' ],
         'font-src': [ '\'self\'', jsdelivr, cdnOrigin, '\'report-sample\'' ],
-        'object-src': [ '\'none\'', '\'report-sample\'' ],
+        'object-src': [ '\'none\'' ],
         'form-action': [ '\'self\'', '\'report-sample\'' ],
         'frame-ancestors': [ '\'self\'' ],
         'report-uri': [ '/csp-vio' ],
@@ -69,7 +69,9 @@ module.exports = {
   buildModules: [
     '@nuxtjs/eslint-module',
     '@nuxtjs/vuetify',
+    '@nuxtjs/google-analytics',
   ],
+  googleAnalytics: { id: process.env.GA_ID },
   modules: [
     '@nuxtjs/dotenv',
   ],

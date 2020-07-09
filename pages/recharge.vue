@@ -92,6 +92,7 @@ export default {
     async recharge (amount) {
       if (!amount || isNaN(amount) || !Number.isInteger(amount)) return
       if (amount > 100000) return this.snackbar('充值金额过大，系统无法处理')
+      this.$ga.event('recharge', amount)
       const url = new URL('/api/recharge-order', location.href)
       url.search = new URLSearchParams({ amount })
       const order = await fetch(url, { method: 'put', credentials: 'same-origin' }).then(res => res.json())

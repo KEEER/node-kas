@@ -3,6 +3,7 @@
     title="设置您的密码"
     subtitle="请您牢记您的密码"
     put-path="/api/password"
+    track="password"
     :get-data="() => ({ current, password })"
     :validate="() => !!current && !!password"
   >

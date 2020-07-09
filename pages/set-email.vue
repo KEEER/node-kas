@@ -3,6 +3,7 @@
     title="设置您的电子邮箱"
     subtitle="这将会向您的邮箱中发送一封验证邮件，请按照邮件中的指示继续操作"
     put-path="/api/email"
+    track="email"
     :get-data="() => ({ email })"
     :validate="() => !!email"
   >
