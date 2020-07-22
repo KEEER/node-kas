@@ -35,7 +35,7 @@ module.exports = {
       hashAlgorithm: 'sha256',
       policies: {
         'default-src': [ '\'self\'', cdnOrigin, '\'report-sample\'' ],
-        'img-src': [ '\'self\'', 'data:', jsdelivr, `https://*.${ALI_OSS_REGION}.aliyuncs.com`, 'https://keeer.net', 'https://*.keeer.net', 'https://www.google-analytics.com' ],
+        'img-src': [ '\'self\'', 'data:', jsdelivr, `https://*.${ALI_OSS_REGION}.aliyuncs.com`, 'https://keeer.net', 'https://*.keeer.net', 'https://www.google-analytics.com', 'https://payjs.cn' ],
         'script-src': [
           '\'self\'', cdnOrigin, jsdelivr, 'https://idframe.keeer.net', 'https://www.google-analytics.com', '\'report-sample\'',
           ...(process.env.NODE_ENV === 'development' ? [ '\'unsafe-eval\'' ] : []),
