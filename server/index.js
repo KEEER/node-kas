@@ -287,7 +287,7 @@ consola._reporters.push(new consola.WinstonReporter(winstonLogger))
 
   // queries
   router.get('/api/user-information', requireLogin, ctx => {
-    if (/^https?:\/\/[^.]+\.keeer.net$/.test(ctx.get('origin'))) {
+    if (/^https?:\/\/(?:[^.]+\.)?keeer.net$/.test(ctx.get('origin'))) {
       ctx.set('Access-Control-Allow-Origin', ctx.get('origin'))
       ctx.set('Vary', 'Origin')
       ctx.set('Access-Control-Allow-Credentials', 'true')
