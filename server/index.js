@@ -14,6 +14,7 @@ const { User } = require('./user')
 const { createCashierOrderUrl, createOrder, callback: payjsCallback, getOrderStatus } = require('./payjs')
 const { types: SMS_TYPES, checkSmsVerificationCode, sendSmsVerificationCode, checkNumber } = require('./sms')
 const { types: EMAIL_TYPES, sendEmailVerification, checkEmailVerificationToken } = require('./email')
+const { applyGiteaRoutes } = require('./gitea')
 const randomBytes = promisify(randomBytesCb)
 
 const app = new Koa()
@@ -450,6 +451,8 @@ consola._reporters.push(new consola.WinstonReporter(winstonLogger))
     winstonLogger.warn(ctx.request.body)
     return ctx.body = 'Thank you for reporting a CSP violation!'
   })
+
+  applyGiteaRoutes(router)
 
   app.use(koaWinston.logger({
     transports: new winston.transports.File({ filename: 'access.log' }),

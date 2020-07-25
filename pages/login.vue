@@ -93,6 +93,7 @@ export default {
         if (ctx.state.user) return ctx.redirect(cfg.redirectUrl)
         if (cfg) return { useCustom: cfg }
       }
+      if (ctx.query.git) return { useCustom: 'git', state: ctx.query.state, redir: ctx.query.redirect_uri }
       if (ctx.state.user) return ctx.redirect('/')
       return { useCustom: false }
     } else if (location.search && /service=/.test(location.search)) {
@@ -130,7 +131,7 @@ export default {
   mounted () {
     this.tab = location.hash === '#login' ? 'login' : 'signup'
     this.$nextTick(() => this.loadTabs = true)
-    if (this.useCustom && this.useCustom !== 'redirect') {
+    if (this.useCustom && this.useCustom !== 'redirect' && this.useCustom !== 'git') {
       for (const k of [ 'title', 'logoSrc', 'backgroundUrl' ]) this[k] = this.useCustom[k] || this[k]
       if (this.useCustom.logoSrc) this.customLogo = true
       if (this.useCustom.backgroundUrl) {
@@ -157,6 +158,8 @@ export default {
         const url = this.useCustom.redirectUrl
         if (/^https?:\/\//.test(url)) location = url
         else this.$router.push(url)
+      } else if (this.useCustom === 'git') {
+        location = '/git/authorize?' + new URLSearchParams({ redirect_uri: this.redir, state: this.state })
       } else this.$router.push('/')
     },
     async login () {
