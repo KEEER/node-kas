@@ -8,6 +8,7 @@ if (!ALI_OSS_BUCKET || !ALI_OSS_REGION) publicPath = '/_nuxt/'
 if (process.env.NODE_ENV !== 'production') publicPath = '/_nuxt/'
 
 module.exports = {
+  telemetry: false,
   mode: 'universal',
   head: {
     titleTemplate: '%s | KEEER 账号',

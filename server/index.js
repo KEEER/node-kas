@@ -36,6 +36,19 @@ const winstonLogger = winston.createLogger({
 })
 consola._reporters.push(new consola.WinstonReporter(winstonLogger))
 
+const rateLimit = (maxHits, maxAge, store = {}, _intervalId = setInterval(() => {
+  const now = Date.now()
+  for (const key in store) if (store[key].expiry < now) delete store[key]
+}, 10000)) => (ctx, next) => {
+  const ip = ctx.state.ip
+  if (!store[ip]) store[ip] = { hits: 0, expiry: Date.now() + maxAge }
+  const stats = store[ip]
+  if (++stats.hits < maxHits) return next()
+  if (stats.hits === maxHits) consola.warn(`limit:exceed: ${ip} is exceeding a rate limit!`)
+  ctx.status = 429
+  return ctx.body = { status: 429, code: 'EABUSE', message: '您的操作过于频繁，请稍候再试。' }
+}
+
 ;(async () => {
   const nuxt = new Nuxt(config)
   const {
@@ -145,7 +158,7 @@ consola._reporters.push(new consola.WinstonReporter(winstonLogger))
     if (frontend) return ctx.redirect('/')
     else return ctx.body = { status: 0 }
   })
-  router.put('/api/email', requireLogin, async ctx => {
+  router.put('/api/email', rateLimit(Number(process.env.EMAIL_LIMIT_HITS), Number(process.env.EMAIL_LIMIT_AGE)), requireLogin, async ctx => {
     const params = ctx.request.body
     if (typeof params !== 'object' || !params) return ctx.body = INVALID_REQUEST
     const { email } = params
@@ -257,7 +270,7 @@ consola._reporters.push(new consola.WinstonReporter(winstonLogger))
   })
 
   // sms
-  router.put('/api/sms-code', async ctx => {
+  router.put('/api/sms-code', rateLimit(Number(process.env.SMS_LIMIT_HITS), Number(process.env.SMS_LIMIT_AGE)), async ctx => {
     const params = ctx.request.body
     if (typeof params !== 'object' || !params) return ctx.body = INVALID_REQUEST
     const { number, type: typeKey } = params
@@ -446,7 +459,7 @@ consola._reporters.push(new consola.WinstonReporter(winstonLogger))
       return ctx.body = { status: -1, message: String(e), code: (e && e.code) || 'EUNKNOWN' }
     }
   })
-  router.post('/csp-vio', ctx => {
+  router.post('/csp-vio', rateLimit(60, 60000), ctx => {
     consola.info('sec:csp caught a violation!')
     winstonLogger.warn(ctx.request.body)
     return ctx.body = 'Thank you for reporting a CSP violation!'
@@ -454,9 +467,11 @@ consola._reporters.push(new consola.WinstonReporter(winstonLogger))
 
   applyGiteaRoutes(router)
 
+  const { GLOBAL_LIMIT_HITS, GLOBAL_LIMIT_AGE } = process.env
+  if (GLOBAL_LIMIT_HITS && GLOBAL_LIMIT_AGE) app.use(rateLimit(Number(GLOBAL_LIMIT_HITS), Number(GLOBAL_LIMIT_AGE)))
   app.use(koaWinston.logger({
     transports: new winston.transports.File({ filename: 'access.log' }),
-    reqUnselect: [ 'headers.cookie', 'headers.authorization' ],
+    reqUnselect: [ 'header.cookie', 'header.authorization' ],
   }))
   app.use(bodyparser({ multipart: true }))
   app.use(async (ctx, next) => { // get service ID
@@ -474,6 +489,7 @@ consola._reporters.push(new consola.WinstonReporter(winstonLogger))
   app.use(async (ctx, next) => { // common headers
     ctx.set('X-Frame-Options', 'SAMEORIGIN')
     ctx.set('X-Powered-By', 'KEEER Account System v4/1.0.1')
+    ctx.state.ip = ctx.get(process.env.REAL_IP_HEADER || 'X-Forwarded-For') || ctx.request.ip
     return await next()
   })
   app.use(async (ctx, next) => {
