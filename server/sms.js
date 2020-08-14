@@ -38,6 +38,13 @@ exports.types = {
   SMS_TYPE_SET_PHONE_NUMBER: 3,
   SMS_TYPE_OTHER: 127,
 }
+const templateCodes = {
+  0: process.env.ALI_SMS_TEMPLATE_CODE_GENERAL,
+  1: process.env.ALI_SMS_TEMPLATE_CODE_VERIFICATION,
+  2: process.env.ALI_SMS_TEMPLATE_CODE_FIND_BACK_PASSWORD,
+  3: process.env.ALI_SMS_TEMPLATE_CODE_SET_PHONE_NUMBER,
+  127: process.env.ALI_SMS_TEMPLATE_CODE_GENERAL,
+}
 exports.sendSmsVerificationCode = async (phoneNumber, type, user, code) => {
   if (!code) code = await generateCode()
   phoneNumber = checkNumber(phoneNumber)
@@ -54,7 +61,7 @@ exports.sendSmsVerificationCode = async (phoneNumber, type, user, code) => {
   const res = await query('INSERT INTO PRE_sms_codes (number, type, user_id, code) VALUES ($1, $2, $3, $4) RETURNING id;', [ phoneNumber, type, userId, code ])
   try {
     consola.info(`About to send ${code} to ${phoneNumber} as #${res.rows[0].id}.`)
-    await sendSms(phoneNumber, process.env.ALI_SMS_VERIFICATION_TEMPLATE_CODE, { code })
+    await sendSms(phoneNumber, templateCodes[type], { code })
   } catch (e) {
     try {
       await query('DELETE FROM PRE_sms_codes WHERE id = $1;', [ res.rows[0].id ])
