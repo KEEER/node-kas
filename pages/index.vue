@@ -92,7 +92,7 @@ export default {
       }
     },
   },
-  head () { return { title: '我的账号' } },
+  head () { return { title: '我的帐号' } },
 }
 </script>
 

@@ -11,12 +11,12 @@ module.exports = {
   telemetry: false,
   mode: 'universal',
   head: {
-    titleTemplate: '%s | KEEER 账号',
+    titleTemplate: '%s | KEEER 帐号',
     title: '',
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { hid: 'description', name: 'description', content: 'KEEER 账号服务' },
+      { hid: 'description', name: 'description', content: 'KEEER 帐号服务' },
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },

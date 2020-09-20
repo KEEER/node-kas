@@ -8,7 +8,7 @@
       <div id="slogan">
         <img id="logo" :src="logoSrc">
         <h1 id="title" class="display-1">{{ title }}</h1>
-        <p id="subtitle" class="subtitle-1">一个账号，使用全部 KEEER 产品</p>
+        <p id="subtitle" class="subtitle-1">一个帐号，使用全部 KEEER 产品</p>
       </div>
       <div id="regbox-out">
         <v-card id="regbox">
