@@ -1,7 +1,7 @@
 <template>
   <set-property
     title="更换您的头像"
-    subtitle="对您的头像所做的更改将反映在您的 KEEER 账户中"
+    subtitle="对您的头像所做的更改将反映在您的 KEEER 帐号中"
     no-submit
     class="center"
   >

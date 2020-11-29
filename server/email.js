@@ -52,9 +52,9 @@ exports.sendEmailVerification = async (address, type, user, token) => {
     url.search = new URLSearchParams({ address, token })
     await sendMail({
       to: address,
-      subject: '验证您的 KEEER 账户邮箱',
-      text: `您好！\n点击以下链接以将您的邮箱绑定到 KEEER 账户（如非本人操作请忽略！）：\n${url}\nKEEER`,
-      html: `您好！<br>点击以下链接以将您的邮箱绑定到 KEEER 账户（如非本人操作请忽略！）：<br><a href="${url}">${url}</a><br>KEEER`,
+      subject: '验证您的 KEEER 帐号邮箱',
+      text: `您好！\n点击以下链接以将您的邮箱绑定到 KEEER 帐号（如非本人操作请忽略！）：\n${url}\nKEEER`,
+      html: `您好！<br>点击以下链接以将您的邮箱绑定到 KEEER 帐号（如非本人操作请忽略！）：<br><a href="${url}">${url}</a><br>KEEER`,
     })
   } catch (e) {
     try {

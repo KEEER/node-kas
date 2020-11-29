@@ -165,7 +165,7 @@ const rateLimit = (maxHits, maxAge, store = {}, _intervalId = setInterval(() => 
     if (!email) return ctx.body = INVALID_REQUEST
     try {
       const user = await User.fromEmail(email)
-      if (user) return ctx.body = { status: 2, message: '这个地址已经被其他账户绑定。', code: 'ETAKEN' }
+      if (user) return ctx.body = { status: 2, message: '这个地址已经被其他帐号绑定。', code: 'ETAKEN' }
       await sendEmailVerification(email, EMAIL_TYPES.EMAIL_TYPE_SET_VERIFICATION, ctx.state.user)
       return ctx.body = { status: 0, message: '验证码已发送，请查收。' }
     } catch (e) {
@@ -186,7 +186,7 @@ const rateLimit = (maxHits, maxAge, store = {}, _intervalId = setInterval(() => 
       const user = uid && await User.fromId(uid)
       if (!address || !token || !uid || !user) return ctx.body = '无效的验证地址'
       const dupUser = await User.fromEmail(address)
-      if (dupUser) return ctx.body = '这个地址已经被其他账户绑定。'
+      if (dupUser) return ctx.body = '这个地址已经被其他帐号绑定。'
       consola.log(`put:email user #${uid} token ${token.substr(0, 10)}... address ${address[0]}**@**.**${address.substr(-1)}`)
       user.options.email = address
       await user.update()
@@ -321,7 +321,7 @@ const rateLimit = (maxHits, maxAge, store = {}, _intervalId = setInterval(() => 
     consola.log(`get:kiuid Processing kiuid query from service ${ctx.state.serviceId}`)
     const { token } = ctx.params
     const user = await User.fromToken(token)
-    if (!user) return ctx.body = { status: 2, message: '这个用户不存在。', code: 'ENOTFOUND' }
+    if (!user) return ctx.body = { status: 2, message: '这个帐号不存在。', code: 'ENOTFOUND' }
     return ctx.body = { status: 0, result: user.options.kiuid }
   })
 
@@ -396,7 +396,7 @@ const rateLimit = (maxHits, maxAge, store = {}, _intervalId = setInterval(() => 
     if (type === 'email') user = await User.fromEmail(identity)
     if (type === 'keeer-id' || type === 'keeerId') user = await User.fromKeeerId(identity)
     if (type === 'kiuid') user = await User.fromKiuid(identity)
-    if (!user) return ctx.body = { status: 2, message: '找不到用户', code: 'ENOTFOUND' }
+    if (!user) return ctx.body = { status: 2, message: '找不到帐号', code: 'ENOTFOUND' }
     try {
       await user.pay(Number(amount), ctx.state.serviceId)
       consola.info(`Creating payment for service ${ctx.state.serviceId} and ${amount} centi-kredit`)

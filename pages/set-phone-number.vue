@@ -1,7 +1,7 @@
 <template>
   <set-property
     title="变更您的手机号"
-    subtitle="这将变更您 KEEER 账户所绑定的手机号码"
+    subtitle="这将变更您 KEEER 帐号所绑定的手机号码"
     put-path="/api/phone-number"
     track="phone-number"
     :get-data="() => ({ number, code, password })"

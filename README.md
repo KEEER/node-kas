@@ -60,7 +60,7 @@ Form fields:
 
 #### Responses
 - `{ status: 0, message: '验证码已发送，请查收。' }`
-- `{ status: 2, message: '这个地址已经被其他账户绑定。', code: 'ETAKEN' }`
+- `{ status: 2, message: '这个地址已经被其他帐号绑定。', code: 'ETAKEN' }`
 - `{ status: 3, message: '操作过于频繁，请过一分钟后再试', code: 'EABUSE' }`
 - `{ status: 4, message: '邮件地址不正确', code: 'EINVALID_ADDRESS' }`
 - `{ status: 5, message: '暂时无法发送邮件', code: 'ESEND' }`
@@ -162,7 +162,7 @@ Returns `:string` KIUID
 
 #### Responses
 - `{ status: 0, result: user.options.kiuid }`
-- `{ status: 2, message: '这个用户不存在。', code: 'ENOTFOUND' }`
+- `{ status: 2, message: '这个帐号不存在。', code: 'ENOTFOUND' }`
 
 ### `GET /api/recharge-order?id=<order ID>[&watch=true]`
 RL, Gets [ and watches ] a recharge order    
@@ -197,7 +197,7 @@ Identity types:
 
 #### Responses
 - `{ status: 0 }`
-- `{ status: 2, message: '找不到用户', code: 'ENOTFOUND' }`
+- `{ status: 2, message: '找不到帐号', code: 'ENOTFOUND' }`
 - `{ status: 3, message: String(e), code: 'EINVALID_AMOUNT' }` Invalid amount
 - `{ status: 4, message: '余额不足', code: 'EINSUFFICIENT_KREDIT' }` User has insufficient kredit
 

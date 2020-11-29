@@ -30,8 +30,8 @@
             </ul>
             <p>在上述情况下，用户可以选择向 <a href="mailto:refund@keeer.net">refund@keeer.net</a> 发送返现请求，并提供以下材料以申请返现：</p>
             <ul>
-              <li><span class="item">-</span>您注册 KEEER 账户的手机号</li>
-              <li><span class="item">-</span>一个可以用于联系的手机号（最好也是注册 KEEER 账户的手机号）</li>
+              <li><span class="item">-</span>您注册 KEEER 帐号的手机号</li>
+              <li><span class="item">-</span>一个可以用于联系的手机号（最好也是注册 KEEER 帐号的手机号）</li>
               <li><span class="item">-</span>您接收返现的银行卡号或微信号（请注意，暂不支持移动支付转账）</li>
               <li><span class="item">-</span>您支付的有关证据（包含相关交易记录信息的微信截屏）</li>
             </ul>
