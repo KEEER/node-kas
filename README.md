@@ -248,4 +248,6 @@ $ npm run build
 $ npm run start
 ```
 
+Please do not run the content in `sql/migration` directly. Instead, use the script at `scripts/migrate-database`.
+
 For detailed explanation on how things work, check out [Nuxt.js docs](https://nuxtjs.org).

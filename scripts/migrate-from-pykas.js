@@ -48,7 +48,7 @@ useClient(async client => {
     kiuidMapping.set(user.kiuid, id)
   }
   consola.info('Migrate tokens...')
-  for (const token of tokens) await client.query('INSERT INTO PRE_tokens (user_id, token) VALUES ($1, $2);', [ kiuidMapping.get(token.kiuid), token.token_id ])
+  for (const token of tokens) await client.query('INSERT INTO sessions (user_id, token) VALUES ($1, $2);', [ kiuidMapping.get(token.kiuid), token.token_id ])
   consola.info('Migrate trade records...')
   for (const record of tradeRecords) {
     const uid = kiuidMapping.get(record.user_kiuid)

@@ -19,17 +19,20 @@
         </v-list-item>
       </settings-group>
       <settings-group title="帐号设置">
-        <settings-item title="更改密码" to="/set-password" />
         <settings-item title="设置电子邮箱" to="/set-email" />
         <settings-item title="变更手机号" to="/set-phone-number" />
         <settings-item v-if="!keeerId" title="设置 KEEER ID" to="/set-keeer-id" />
         <v-list-item v-else>您的 KEEER ID: {{ keeerId }}</v-list-item>
       </settings-group>
+      <settings-group title="安全">
+        <settings-item title="更改密码" to="/set-password" />
+        <settings-item title="登录设备管理" to="/sessions" />
+      </settings-group>
       <settings-group title="Kredit">
         <v-list-item>您的 Kredit 余额：{{ kredit / 100 }}</v-list-item>
         <settings-item title="充值" to="/recharge" />
       </settings-group>
-      <center><v-btn outlined color="error" @click="logout">退出登录</v-btn></center>
+      <v-btn outlined color="error" @click="logout">退出登录</v-btn>
     </container>
     <container dark>
       Copyright &copy; 2015-present KEEER. All rights reserved.
@@ -45,7 +48,7 @@ import SettingsGroup from '~/components/settings-group'
 export default {
   components: { Container, SettingsItem, SettingsGroup, Headline },
   inject: [ 'snackbar' ],
-  async asyncData ({ req, res }) {
+  async asyncData ({ req }) {
     const notLoggedIn = {
       notLoggedIn: true,
       nickname: '未登录用户',

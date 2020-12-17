@@ -8,6 +8,7 @@ yarn-debug.log*
 yarn-error.log*
 
 .vscode
+maxmind-data
 
 # Runtime data
 pids

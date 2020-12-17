@@ -1,5 +1,5 @@
 <template>
-  <v-list-item :to="to" nuxt>
+  <v-list-item :to="to" nuxt class="settings-item">
     <v-list-item-title>{{ title }}</v-list-item-title>
     <v-btn icon><v-icon>mdi-chevron-right</v-icon></v-btn>
   </v-list-item>

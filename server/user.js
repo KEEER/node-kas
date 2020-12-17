@@ -35,9 +35,14 @@ exports.User = class User {
     })
   }
 
-  async createToken () {
+  async createToken (ctx) {
     const token = uuid()
-    await query('INSERT INTO PRE_tokens (token, user_id) VALUES ($1, $2);', [ token, this.options.id ])
+    if (ctx) {
+      const sql = 'INSERT INTO PRE_sessions (token, user_id, login_ip, last_seen_ip, user_agent) VALUES ($1, $2, $3, $3, $4);'
+      await query(sql, [ token, this.options.id, ctx.state.ip, ctx.get('User-Agent') ])
+    } else {
+      await query('INSERT INTO PRE_sessions (token, user_id) VALUES ($1, $2);', [ token, this.options.id ])
+    }
     return token
   }
 
@@ -127,10 +132,17 @@ exports.User = class User {
     this._changes.clear()
   }
 
+  async updateLastSeen (ip) {
+    if (!ip) throw new Error('IP address must be provided')
+    if (!this.currentToken) return
+    await query('UPDATE PRE_sessions SET last_seen = NOW(), last_seen_ip = $2 WHERE token = $1;', [ this.currentToken, ip ])
+  }
+
   static async create (phoneNumber, password) {
     const salt = await User._generateSalt()
     const saltedPassword = User._addSalt(password, salt)
     const kiuid = uuid()
+    consola.log(`user:create number ${phoneNumber} password ***`)
     const sql = 'INSERT INTO PRE_users (phone_number, salt, password, kiuid) VALUES ($1, $2, $3, $4) RETURNING id;'
     const res = await query(sql, [ phoneNumber, salt, saltedPassword, kiuid ])
     return new User({
@@ -163,13 +175,15 @@ exports.User = class User {
   static async fromKiuid (kiuid) { return await User._from('kiuid', kiuid) }
 
   static async fromToken (token) {
-    const res = await query('SELECT * FROM PRE_users WHERE id = (SELECT user_id FROM PRE_tokens WHERE token = $1);', [ token ])
-    return User._fromDb(res.rows[0])
+    const res = await query('SELECT * FROM PRE_users WHERE id = (SELECT user_id FROM PRE_sessions WHERE token = $1);', [ token ])
+    const user = User._fromDb(res.rows[0])
+    if (user) user.currentToken = token
+    return user
   }
 
   static async fromContext (ctx) {
     const token = ctx.cookies.get(process.env.TOKEN_COOKIE_NAME)
-    const token2Match = ctx.get('Authorization').toLowerCase().match(/^bearer ([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/)
+    const token2Match = ctx.get('Authorization').toLowerCase().match(/^bearer ([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/i)
     if (token2Match && token2Match[1]) {
       const user = await User.fromToken(token2Match[1])
       if (user) return user
@@ -188,5 +202,5 @@ exports.User = class User {
 }
 
 setInterval(async () => {
-  await query('DELETE FROM PRE_tokens WHERE time < $1;', [ new Date(Date.now() - parseInt(process.env.TOKEN_MAXAGE)) ])
+  await query('DELETE FROM PRE_sessions WHERE created < $1;', [ new Date(Date.now() - parseInt(process.env.TOKEN_MAXAGE)) ])
 }, parseInt(process.env.TOKEN_CLEAR_INTERVAL))

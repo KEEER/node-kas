@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-btn icon color="#f5fafd" class="back" @click="back"><v-icon>mdi-arrow-left</v-icon></v-btn>
-    <headline :title="title" :subtitle="subtitle" />
+    <headline :title="title" :subtitle="subtitle" align-center />
     <container profile>
       <form @submit="submit(); $event.preventDefault()">
         <slot />

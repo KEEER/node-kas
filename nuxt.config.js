@@ -23,22 +23,22 @@ module.exports = {
       {
         rel: 'stylesheet',
         type: 'text/css',
-        href: 'https://cdn.jsdelivr.net/npm/@mdi/font@5.3.45/css/materialdesignicons.min.css',
-        integrity: 'sha256-nwNjrH7J9zS/Ti4twtWX7OsC5QdQHCIKTv5cLMsGo68=',
+        href: 'https://cdn.jsdelivr.net/npm/@mdi/font@5.8.55/css/materialdesignicons.min.css',
+        integrity: 'sha256-EZPoNbrxZm1uWJ3Dv+6E50gsinU2w1iD0QzBGr0TRgQ=',
         crossorigin: 'anonymous',
       },
     ],
     htmlAttrs: { lang: 'zh-CN' },
   },
   render: {
-    csp: {
+    csp: process.env.NODE_ENV === 'development' && !process.env.DEBUG_CSP ? false : {
       reportOnly: false,
       hashAlgorithm: 'sha256',
       policies: {
         'default-src': [ '\'self\'', cdnOrigin, '\'report-sample\'' ],
         'img-src': [ '\'self\'', 'data:', jsdelivr, `https://*.${ALI_OSS_REGION}.aliyuncs.com`, 'https://keeer.net', 'https://*.keeer.net', 'https://www.google-analytics.com', 'https://payjs.cn' ],
         'script-src': [
-          '\'self\'', cdnOrigin, jsdelivr, 'https://idframe.keeer.net', 'https://www.google-analytics.com', '\'report-sample\'',
+          '\'self\'', cdnOrigin, jsdelivr, 'https://idframe.keeer.net', 'https://www.google-analytics.com', 'https://ssl.google-analytics.com', '\'report-sample\'',
           ...(process.env.NODE_ENV === 'development' ? [ '\'unsafe-eval\'' ] : []),
         ],
         'style-src': [ '\'self\'', jsdelivr, cdnOrigin, '\'unsafe-inline\'', '\'report-sample\'' ],
@@ -46,6 +46,7 @@ module.exports = {
         'object-src': [ '\'none\'' ],
         'form-action': [ '\'self\'', '\'report-sample\'' ],
         'frame-ancestors': [ '\'self\'' ],
+        'connect-src': [ '\'self\'', 'https://www.google-analytics.com' ],
         'report-uri': [ '/csp-vio' ],
       },
     },

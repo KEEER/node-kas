@@ -1,5 +1,5 @@
 <template>
-  <v-card outlined class="group">
+  <div class="group">
     <h3 class="headline">{{ title }}</h3>
     <v-list>
       <v-divider />
@@ -7,7 +7,7 @@
         <slot />
       </v-list-item-group>
     </v-list>
-  </v-card>
+  </div>
 </template>
 
 <script>
@@ -19,7 +19,7 @@ export default {
 <style scoped>
 .group { margin: 16px 0; }
 h3 {
-  padding: 0 1rem;
+  padding: 0 16px;
   margin: 20px 0 8px;
   color: #002d4d;
 }

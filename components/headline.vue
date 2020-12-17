@@ -1,5 +1,5 @@
 <template>
-  <container dark header align-center>
+  <container dark header v-bind="$attrs">
     <h1 class="display-3">{{ title }}</h1>
     <h2 class="subtitle-1">{{ subtitle }}</h2>
   </container>
@@ -24,4 +24,5 @@ export default {
     font-weight: 400;
   }
 }
+h1, h2 { padding: 0 16px; }
 </style>

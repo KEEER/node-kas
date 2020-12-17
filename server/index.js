@@ -15,6 +15,8 @@ const { createCashierOrderUrl, createOrder, callback: payjsCallback, getOrderSta
 const { types: SMS_TYPES, checkSmsVerificationCode, sendSmsVerificationCode, checkNumber } = require('./sms')
 const { types: EMAIL_TYPES, sendEmailVerification, checkEmailVerificationToken } = require('./email')
 const { applyGiteaRoutes } = require('./gitea')
+const { showSession } = require('./session')
+const { validateKeeerId, validateNickname } = require('./filter')
 const randomBytes = promisify(randomBytesCb)
 
 const app = new Koa()
@@ -36,17 +38,30 @@ const winstonLogger = winston.createLogger({
 })
 consola._reporters.push(new consola.WinstonReporter(winstonLogger))
 
-const rateLimit = (maxHits, maxAge, store = {}, _intervalId = setInterval(() => {
+const rateLimit = (maxHits, maxAge, key = ctx => ctx.state.ip, store = {}, _intervalId = setInterval(() => {
   const now = Date.now()
   for (const key in store) if (store[key].expiry < now) delete store[key]
 }, 10000)) => (ctx, next) => {
-  const ip = ctx.state.ip
-  if (!store[ip]) store[ip] = { hits: 0, expiry: Date.now() + maxAge }
-  const stats = store[ip]
+  const name = key(ctx)
+  if (name === '__BYPASS__') return next()
+  if (!store[name]) store[name] = { hits: 0, expiry: Date.now() + maxAge }
+  const stats = store[name]
   if (++stats.hits < maxHits) return next()
-  if (stats.hits === maxHits) consola.warn(`limit:exceed: ${ip} is exceeding a rate limit!`)
+  if (stats.hits === maxHits) consola.warn(`limit:exceed: ${name} is exceeding a rate limit!`)
   ctx.status = 429
   return ctx.body = { status: 429, code: 'EABUSE', message: '您的操作过于频繁，请稍候再试。' }
+}
+const rateLimitPhoneNumber = ctx => {
+  if (!ctx.request.body || !ctx.request.body.number) return '__BYPASS__'
+  try {
+    const number = ctx.state.number = checkNumber(ctx.request.body.number)
+    return number
+  } catch (e) {
+    if (e.code === 'EINVALID_PHONE_NUMBER') {
+      ctx.body = { status: 4, message: '手机号不正确', code: e.code }
+      return '__BYPASS__'
+    }
+  }
 }
 
 ;(async () => {
@@ -64,8 +79,9 @@ const rateLimit = (maxHits, maxAge, store = {}, _intervalId = setInterval(() => 
 
   // misc
   const validateCsrf = (ctx, token) => token === ctx.cookies.get('_csrf')
+  const NOT_LOGGED_IN = { status: -2, message: '您没有登录', code: 'EUNAUTHORIZED' }
   const requireLogin = (ctx, next) => {
-    if (!ctx.state.user) return ctx.body = { status: -2, message: '您没有登录', code: 'EUNAUTHORIZED' }
+    if (!ctx.state.user) return ctx.body = NOT_LOGGED_IN
     return next()
   }
   const requireService = async (ctx, next) => {
@@ -77,6 +93,10 @@ const rateLimit = (maxHits, maxAge, store = {}, _intervalId = setInterval(() => 
     const res = await query('SELECT login_prefs FROM PRE_services WHERE name = $1;', [ name ])
     if (res.rows.length < 1) return null
     return res.rows[0].login_prefs
+  }
+  app.context.getSessions = async function () { // not arrow function because the use of `this`
+    const sessions = (await query('SELECT * FROM PRE_sessions WHERE user_id = $1 ORDER BY last_seen DESC LIMIT 100;', [ this.state.user.options.id ])).rows
+    return await Promise.all(sessions.map(s => showSession(s, this)))
   }
   app.context.avatarFromName = name => {
     const { ALI_OSS_REGION, ALI_OSS_BUCKET, ALI_OSS_AVATAR_PREFIX } = process.env
@@ -207,6 +227,7 @@ const rateLimit = (maxHits, maxAge, store = {}, _intervalId = setInterval(() => 
     const id = ctx.request.body.keeerId
     if (typeof id !== 'string') return ctx.body = INVALID_REQUEST
     if (!/^[a-zA-Z][0-9a-zA-Z_-]{1,31}$/.test(id)) return ctx.body = { status: 3, message: 'KEEER ID 包含非法字符', code: 'EINVALID_ID' }
+    if (!validateKeeerId(id)) return ctx.body = { status: 3, message: '您不能使用这个 KEEER ID，确需使用请联系 KEEER', code: 'EINVALID_ID' }
     const res = await query('SELECT keeer_id FROM PRE_users WHERE lower_keeer_id = LOWER($1);', [ id ])
     if (res.rows.length > 0) return ctx.body = { status: 4, message: '这个 KEEER ID 已被占用', code: 'EDUPLICATE' }
     consola.log(`put:keeer-id user #${ctx.state.user.options.id} as ${id}`)
@@ -218,6 +239,7 @@ const rateLimit = (maxHits, maxAge, store = {}, _intervalId = setInterval(() => 
     const nickname = ctx.request.body.nickname
     if (typeof nickname !== 'string') return ctx.body = INVALID_REQUEST
     if (nickname.length > 64) return ctx.body = { status: 2, message: '昵称过长', code: 'ETOO_LONG' }
+    if (!validateNickname(nickname)) return ctx.body = { status: 3, message: '您不能使用这个昵称，确需使用请联系 KEEER', code: 'EINVALID_NICKNAME' }
     consola.log(`put:nickname user #${ctx.state.user.options.id} as ${nickname}`)
     ctx.state.user.options.nickname = nickname
     await ctx.state.user.update()
@@ -310,6 +332,7 @@ const rateLimit = (maxHits, maxAge, store = {}, _intervalId = setInterval(() => 
     const avatar = ctx.avatarFromName(avatarName)
     return ctx.body = { status: 0, result: { avatar, nickname, keeerId, kredit } }
   })
+  router.get('/api/sessions', requireLogin, async ctx => ctx.body = { status: 0, result: await ctx.getSessions() })
   router.get('/api/login-config', async ctx => {
     if (!ctx.query.service) return ctx.body = INVALID_REQUEST
     const cfg = await ctx.getServiceLoginConfig(ctx.query.service)
@@ -360,7 +383,7 @@ const rateLimit = (maxHits, maxAge, store = {}, _intervalId = setInterval(() => 
       ctx.body = { status: -1, message: String(e), code: (e && e.code) || 'EUNKNOWN' }
     }
   })
-  router.put('/api/recharge-order', requireLogin, async ctx => {
+  router.put('/api/recharge-order', rateLimit(30, 60000), requireLogin, async ctx => {
     if (ctx.isMobile()) return ctx.body = await ctx.createCashierOrder()
     else {
       const order = await ctx.createOrder()
@@ -415,7 +438,7 @@ const rateLimit = (maxHits, maxAge, store = {}, _intervalId = setInterval(() => 
     if (!maxAge) maxAge = parseInt(TOKEN_MAXAGE)
     ctx.cookies.set(TOKEN_COOKIE_NAME, token, { domain: TOKEN_COOKIE_DOMAIN, maxAge, httpOnly: false, signed: false })
   }
-  router.put('/api/token', async ctx => { // log in
+  router.put('/api/token', rateLimit(10, 60000), async ctx => { // log in
     const auth = ctx.get('Authorization')
     if (!auth) return ctx.body = INVALID_REQUEST
     const match = auth.match(/^basic ([A-Za-z0-9+=]+)$/i)
@@ -425,36 +448,42 @@ const rateLimit = (maxHits, maxAge, store = {}, _intervalId = setInterval(() => 
     const [ , identity, password ] = credMatch
     const user = await User.login(identity, password)
     if (!user) return ctx.body = { status: 2, message: '用户名或密码错误', code: 'EBAD_CREDENTIALS' }
-    const token = await user.createToken()
+    const token = await user.createToken(ctx)
     if (ctx.query['set-cookie']) setTokenCookie(ctx, token)
     return ctx.body = { status: 0, message: '登录成功', result: token }
   })
   router.delete('/api/token/:token?', async ctx => { // log out
     const token = ctx.params.token || ctx.cookies.get(process.env.TOKEN_COOKIE_NAME)
-    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(token)) return ctx.body = INVALID_REQUEST
-    const res = await query('DELETE FROM PRE_tokens WHERE token = $1;', [ token ])
-    if (res.rowCount < 1) return ctx.body = { status: 2, message: '已失效的登录', code: 'ENOTFOUND' }
-    if (ctx.query['set-cookie']) setTokenCookie(ctx, '', 0)
-    return ctx.body = { status: 0, message: '退出登录成功' }
+    if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(token)) {
+      const res = await query('DELETE FROM PRE_sessions WHERE token = $1;', [ token ])
+      if (res.rowCount < 1) return ctx.body = { status: 2, message: '已失效的登录', code: 'ENOTFOUND' }
+      if (ctx.query['set-cookie']) setTokenCookie(ctx, '', 0)
+      return ctx.body = { status: 0, message: '退出登录成功' }
+    } else if (isFinite(token)) { // token ID
+      if (!ctx.state.user) return ctx.body = NOT_LOGGED_IN
+      const res = await query('DELETE FROM PRE_sessions WHERE user_id = $1 and id = $2;', [ ctx.state.user.options.id, Number(token) ])
+      if (res.rowCount > 0) return ctx.body = { status: 0, message: '移除设备成功' }
+      return ctx.body = { status: 3, message: '不存在这个设备', code: 'ENOTFOUND' }
+    }
+    return ctx.body = INVALID_REQUEST
   })
-  router.put('/api/user', async ctx => { // sign up
+  router.put('/api/user', rateLimit(10, 60000), rateLimit(10, 60000, rateLimitPhoneNumber), async ctx => { // sign up
     const params = ctx.request.body
     if (typeof params !== 'object' || !params) return ctx.body = INVALID_REQUEST
     const { number: numberIn, code, password } = params
     if (!numberIn || !code || !password) return ctx.body = INVALID_REQUEST
     if (!/^[\x21-\x7E]{6,32}$/.test(password)) return ctx.body = { status: 2, message: '密码不符合要求', code: 'EINVALID_PASSWORD' }
     try {
-      const number = checkNumber(numberIn)
+      const number = ctx.state.number
       const dupRes = await query('SELECT phone_number FROM PRE_users WHERE phone_number = $1;', [ number ])
       if (dupRes.rows.length > 0) return ctx.body = { status: 5, message: '您已经注册，请直接登录或找回密码', code: 'EDUPLICATE' }
       if (await checkSmsVerificationCode(number, code, SMS_TYPES.SMS_TYPE_REGISTER)) {
         const user = await User.create(number, password)
-        const token = await user.createToken()
+        const token = await user.createToken(ctx)
         if (ctx.query['set-cookie']) setTokenCookie(ctx, token)
         return ctx.body = { status: 0, message: '您已经成功注册！', result: token }
       } else return ctx.body = { status: 3, message: '验证码错误', code: 'EBAD_TOKEN' }
     } catch (e) {
-      if (e.code === 'EINVALID_PHONE_NUMBER') return ctx.body = { status: 4, message: '手机号不正确', code: e.code }
       consola.error(e)
       return ctx.body = { status: -1, message: String(e), code: (e && e.code) || 'EUNKNOWN' }
     }
@@ -478,7 +507,7 @@ const rateLimit = (maxHits, maxAge, store = {}, _intervalId = setInterval(() => 
     ctx.state.serviceId = null
     const auth = ctx.get('Authorization')
     if (!auth) return await next()
-    const match = auth.toLowerCase().match(/^bearer ([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/)
+    const match = auth.toLowerCase().match(/^bearer ([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/i)
     if (!match || !match[1]) return await next()
     const token = match[1]
     const res = await query('SELECT id FROM PRE_services WHERE token = $1;', [ token ])
@@ -502,6 +531,9 @@ const rateLimit = (maxHits, maxAge, store = {}, _intervalId = setInterval(() => 
     ctx.status = 200
     ctx.respond = false
     ctx.req.ctx = ctx
+    if (ctx.state.user) {
+      ctx.state.user.updateLastSeen(ctx.state.ip).catch(e => consola.warn(e))
+    }
     nuxt.render(ctx.req, ctx.res)
   })
   app.listen(port, host)

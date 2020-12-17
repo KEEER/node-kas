@@ -3,7 +3,7 @@ BEGIN;
 CREATE TABLE public.version (
   version bigint NOT NULL
 );
-INSERT INTO public.version (version) VALUES (1);
+INSERT INTO public.version (version) VALUES (3);
 
 CREATE TABLE public.users (
   id bigserial NOT NULL,
@@ -11,6 +11,7 @@ CREATE TABLE public.users (
   salt character(16) NOT NULL,
   password character(128) NOT NULL,
   keeer_id character varying(32),
+  lower_keeer_id character varying(32),
   email character varying(320),
   nickname character varying(64),
   kiuid uuid NOT NULL,
@@ -27,13 +28,17 @@ CREATE INDEX IDX_users_kiuid ON public.users (kiuid);
 CREATE INDEX IDX_users_phone_number ON public.users (phone_number);
 CREATE INDEX IDX_users_email ON public.users (email);
 
-CREATE TABLE public.tokens (
+CREATE TABLE public.sessions (
   id bigserial NOT NULL,
   token uuid NOT NULL,
   user_id bigint NOT NULL,
-  time timestamp NOT NULL DEFAULT NOW(),
-  CONSTRAINT tokens_pkey PRIMARY KEY(id),
-  CONSTRAINT tokens_user_id_fkey FOREIGN KEY (user_id)
+  created timestamp NOT NULL DEFAULT NOW(),
+  last_seen timestamp NOT NULL DEFAULT NOW(),
+  user_agent text,
+  login_ip inet,
+  last_seen_ip inet,
+  CONSTRAINT sessions_pkey PRIMARY KEY(id),
+  CONSTRAINT sessions_user_id_fkey FOREIGN KEY (user_id)
     REFERENCES public.users (id) MATCH SIMPLE
     ON UPDATE CASCADE
     ON DELETE CASCADE
