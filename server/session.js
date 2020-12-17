@@ -16,7 +16,7 @@ exports.showSession = async (session, ctx) => {
   const uaString = [ [ os.name, os.version ], [ device.vendor, device.model ], [ browser.name, browser.version ] ]
     .map(([ name, version ]) => name ? version ? `${name} ${version}` : name : null)
     .filter(Boolean)
-    .join('，')
+    .join('，') || '未知设备'
   const current = ctx ? ctx.cookies.get(process.env.TOKEN_COOKIE_NAME) === session.token : null
   return { id, current, loginTime, lastSeenTime, loginLocation, lastSeenLocation, icons, uaString }
 }
