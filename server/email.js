@@ -3,20 +3,35 @@ const { promisify } = require('util')
 const { createTransport } = require('nodemailer')
 const validator = require('email-validator')
 const consola = require('consola')
+const fetch = require('node-fetch')
 const { query } = require('./db')
 const randomBytes = promisify(randomBytesCb)
 
-const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_FROM_ADDRESS, EMAIL_INTERVAL, EMAIL_MAXAGE } = process.env
+const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_FROM_ADDRESS, EMAIL_INTERVAL, EMAIL_MAXAGE, MAILPROXY, MAILPROXY_AUTH } = process.env
 
-const transport = createTransport({
+const transport = {
   host: SMTP_HOST,
   port: Number(SMTP_PORT),
   auth: {
     user: SMTP_USER,
     pass: SMTP_PASS,
   },
-})
-const sendMail = options => transport.sendMail({ from: SMTP_FROM_ADDRESS, ...options })
+}
+const sendMail = MAILPROXY
+  ? async mail => {
+    const res = await fetch(MAILPROXY, {
+      method: 'post',
+      body: JSON.stringify({ transport, mail }),
+      headers: { Authorization: MAILPROXY_AUTH },
+    })
+    if (res.status === 401) throw new Error('Mail proxy: Unauthorized')
+    const data = await res.json()
+    if (data.error) throw new Error(data.error)
+    if (!data) return
+    return data.result
+  }
+  : mail => createTransport(transport).sendMail(mail)
+const send = options => sendMail({ from: SMTP_FROM_ADDRESS, ...options })
 
 const checkAddress = address => {
   if (!validator.validate(address)) {
@@ -50,7 +65,7 @@ exports.sendEmailVerification = async (address, type, user, token) => {
     consola.info(`About to send ${token.substring(0, 6)}... to ${address} as #${res.rows[0].id}.`)
     const url = new URL('/confirm-email', process.env.BASE_URL)
     url.search = new URLSearchParams({ address, token })
-    await sendMail({
+    await send({
       to: address,
       subject: '验证您的 KEEER 帐号邮箱',
       text: `您好！\n点击以下链接以将您的邮箱绑定到 KEEER 帐号（如非本人操作请忽略！）：\n${url}\nKEEER`,

@@ -22,7 +22,7 @@
         <settings-item title="设置电子邮箱" to="/set-email" />
         <settings-item title="变更手机号" to="/set-phone-number" />
         <settings-item v-if="!keeerId" title="设置 KEEER ID" to="/set-keeer-id" />
-        <v-list-item v-else>您的 KEEER ID: {{ keeerId }}</v-list-item>
+        <v-list-item v-else>您的 KEEER ID：{{ keeerId }}</v-list-item>
       </settings-group>
       <settings-group title="安全">
         <settings-item title="更改密码" to="/set-password" />

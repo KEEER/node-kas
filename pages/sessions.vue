@@ -74,7 +74,10 @@ export default {
   top: 12px;
   left: 12px;
 }
-.session-abstract { padding-left: 8px; }
+.session-abstract {
+  padding-left: 8px;
+  line-height: 1.5em;
+}
 </style>
 <style>
 .sessions-header h1, .sessions-header h2 { padding: 0 26px !important; }
