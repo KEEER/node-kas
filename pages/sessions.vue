@@ -38,7 +38,7 @@ export default {
       return { notLoggedIn: false, sessions: await ctx.getSessions() || [] }
     } else {
       const res = await getSessions()
-      return { notLoggedIn: res.status !== 0 && res.code !== 'EABUSE', sessions: res.result || [] }
+      return { notLoggedIn: res.code === 'EUNAUTHORIZED', sessions: res.result || [] }
     }
   },
   inject: [ 'snackbar' ],

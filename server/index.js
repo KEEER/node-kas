@@ -181,8 +181,8 @@ const rateLimitPhoneNumber = ctx => {
   router.put('/api/email', rateLimit(Number(process.env.EMAIL_LIMIT_HITS), Number(process.env.EMAIL_LIMIT_AGE)), requireLogin, async ctx => {
     const params = ctx.request.body
     if (typeof params !== 'object' || !params) return ctx.body = INVALID_REQUEST
-    const { email } = params
-    if (!email) return ctx.body = INVALID_REQUEST
+    if (!params.email) return ctx.body = INVALID_REQUEST
+    const email = String(params.email).toLowerCase()
     try {
       const user = await User.fromEmail(email)
       if (user) return ctx.body = { status: 2, message: '这个地址已经被其他帐号绑定。', code: 'ETAKEN' }

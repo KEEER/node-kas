@@ -28,6 +28,7 @@ Returns JSON if not otherwise stated:
 - `{"status":1,"message":"非法请求","code":"EINVALID_REQUEST"}` - `1` indicates an invalid request
 - `{"status":-1,"message":"TypeError: Cannot convert null or undefined to object","code":"EUNKNOWN"}` - `-1` indicates an unknown error
 - `{"status":-2,"message":"您尚未登录","code":"EUNAUTHORIZED"}` - `-2` indicates unauthorized
+- `{"status":429,"message":"您的操作过于频繁，请稍候再试。","code":"EABUSE"}` - `429` indicates rate limit exceeded
 
 Please use the `code` to identify exceptions when possible, as status codes (except `0`) are non-informational and may subject to change.
 
@@ -83,6 +84,7 @@ Form fields:
 #### Responses
 - `{ status: 0, message: '成功修改昵称' }`
 - `{ status: 2, message: '昵称过长', code: 'ETOO_LONG' }`
+- `{ status: 3, message: '您不能使用这个昵称，确需使用请联系 KEEER', code: 'EINVALID_NICKNAME' }`
 
 ### `PUT /api/password`
 Sets or finds back password
@@ -148,6 +150,21 @@ Returns:
 #### Responses
 - `{ status: 0, result: { avatar, nickname, keeerId, kredit } }`
 
+### `GET /api/sessions`
+RL, Gets current sessions
+Returns:
+- `id:int` session ID
+- `current:boolean` true if the session is the current session
+- `loginTime:string` ISO string of login time
+- `lastSeenTime:string` ISO string of last seen time
+- `loginLocation:string` location of login
+- `lastSeenLocation:string` location of last seen
+- `icons:string[]` icons names to show for the session
+- `uaString:string` name to show for the session
+
+#### Responses
+- `{ status: 0, result: [ (...) ] }`
+
 ### `GET /api/login-config?service=<service name>`
 Gets login UI config for the designated service    
 Returns: `{ title, logoSrc, backgroundUrl, themeColor, redirectUrl, backgroundCopyright, backgroundCopyrightUrl }`
@@ -212,10 +229,16 @@ Headers:
 
 ### `DELETE /api/token/<token?>[?set-cookie=true]`
 Log out (i.e. destroys the token in URL or cookies) [ and removes cookies ].
+Token is a KEEER Account Token (i.e. UUID for current implementation) or a session ID (i.e. integer).
 
 #### Responses
+For KEEER Account Tokens:
 - `{ status: 0, message: '退出登录成功' }`
 - `{ status: 2, message: '已失效的登录', code: 'ENOTFOUND' }`
+
+For session IDs:
+- `{ status: 0, message: '移除设备成功' }`
+- `{ status: 3, message: '不存在这个设备', code: 'ENOTFOUND' }`
 
 ### `PUT /api/user[?set-cookie=true]`
 Signs up (i.e. creates a new user) [ and sets token cookie in response header ]    

@@ -194,7 +194,8 @@ exports.User = class User {
   static async login (identity, password) {
     if (!identity || !password) return null
     consola.log(`user:login ident ${identity} password ***`)
-    const users = (await query('SELECT * FROM PRE_users WHERE lower_keeer_id = LOWER($1) OR phone_number = $1 OR email = $1;', [ identity ])).rows.map(o => User._fromDb(o))
+    const sql = 'SELECT * FROM PRE_users WHERE lower_keeer_id = LOWER($1) OR phone_number = $1 OR email = LOWER($1);'
+    const users = await Promise.all((await query(sql, [ identity ])).rows.map(o => User._fromDb(o)))
     for (const user of users) if (user.passwordMatches(password)) return user
     consola.log(`user:login ident ${identity} failed!`)
     return null
