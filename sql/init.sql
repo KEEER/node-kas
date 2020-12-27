@@ -44,6 +44,8 @@ CREATE TABLE public.sessions (
     ON DELETE CASCADE
 );
 
+CREATE INDEX IDX_sessions_token ON public.sessions (token);
+
 CREATE TABLE public.services (
   id bigserial NOT NULL,
   name character varying(32) NOT NULL,
@@ -54,8 +56,6 @@ CREATE TABLE public.services (
 
 CREATE INDEX IDX_services_name ON public.services (name);
 CREATE INDEX IDX_services_token ON public.services (token);
-
-CREATE INDEX IDX_tokens_token ON public.sessions (token);
 
 CREATE TABLE public.payjs_orders (
   id bigserial NOT NULL,
