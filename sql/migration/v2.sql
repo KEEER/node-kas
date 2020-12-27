@@ -18,4 +18,6 @@ ALTER TABLE public.sessions
   ADD login_ip inet,
   ADD last_seen_ip inet;
 
+ALTER INDEX IDX_tokens_token RENAME TO IDX_sessions_token;
+
 COMMIT;

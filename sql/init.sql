@@ -55,7 +55,7 @@ CREATE TABLE public.services (
 CREATE INDEX IDX_services_name ON public.services (name);
 CREATE INDEX IDX_services_token ON public.services (token);
 
-CREATE INDEX IDX_tokens_token ON public.tokens (token);
+CREATE INDEX IDX_tokens_token ON public.sessions (token);
 
 CREATE TABLE public.payjs_orders (
   id bigserial NOT NULL,
