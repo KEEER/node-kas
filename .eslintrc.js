@@ -16,8 +16,8 @@ module.exports = {
     'arrow-parens': 'off',
     'comma-dangle': [ 'error', 'always-multiline' ],
     'comma-spacing': 'error',
-    'curly': 'off',
-    'indent': [ 'error', 2 ],
+    curly: 'off',
+    indent: [ 'error', 2 ],
     'key-spacing': 'error',
     'keyword-spacing': 'error',
     'linebreak-style': [ 'error', 'unix' ],
@@ -30,8 +30,8 @@ module.exports = {
     'no-unused-vars': 'warn',
     'nuxt/no-cjs-in-config': 'off',
     'object-curly-spacing': [ 'error', 'always' ],
-    'quotes': [ 'error', 'single' ],
-    'semi': [ 'error', 'never', { beforeStatementContinuationChars: 'always' } ],
+    quotes: [ 'error', 'single' ],
+    semi: [ 'error', 'never', { beforeStatementContinuationChars: 'always' } ],
     'space-before-blocks': [ 'error', 'always' ],
     'space-before-function-paren': [ 'error', 'always' ],
     'space-in-parens': 'error',
@@ -39,5 +39,5 @@ module.exports = {
     'space-unary-ops': 'error',
     'spaced-comment': [ 'error', 'always', { exceptions: [ '*' ] } ],
     'vue/singleline-html-element-content-newline': 'off',
-  }
+  },
 }

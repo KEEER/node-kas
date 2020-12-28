@@ -31,25 +31,27 @@ module.exports = {
     htmlAttrs: { lang: 'zh-CN' },
   },
   render: {
-    csp: process.env.NODE_ENV === 'development' && !process.env.DEBUG_CSP ? false : {
-      reportOnly: false,
-      hashAlgorithm: 'sha256',
-      policies: {
-        'default-src': [ '\'self\'', cdnOrigin, '\'report-sample\'' ],
-        'img-src': [ '\'self\'', 'data:', jsdelivr, `https://*.${ALI_OSS_REGION}.aliyuncs.com`, 'https://keeer.net', 'https://*.keeer.net', 'https://www.google-analytics.com', 'https://payjs.cn' ],
-        'script-src': [
-          '\'self\'', cdnOrigin, jsdelivr, 'https://idframe.keeer.net', 'https://www.google-analytics.com', 'https://ssl.google-analytics.com', '\'report-sample\'',
-          ...(process.env.NODE_ENV === 'development' ? [ '\'unsafe-eval\'' ] : []),
-        ],
-        'style-src': [ '\'self\'', jsdelivr, cdnOrigin, '\'unsafe-inline\'', '\'report-sample\'' ],
-        'font-src': [ '\'self\'', jsdelivr, cdnOrigin, '\'report-sample\'' ],
-        'object-src': [ '\'none\'' ],
-        'form-action': [ '\'self\'', '\'report-sample\'' ],
-        'frame-ancestors': [ '\'self\'' ],
-        'connect-src': [ '\'self\'', 'https://www.google-analytics.com' ],
-        'report-uri': [ '/csp-vio' ],
+    csp: process.env.NODE_ENV === 'development' && !process.env.DEBUG_CSP
+      ? false
+      : {
+        reportOnly: false,
+        hashAlgorithm: 'sha256',
+        policies: {
+          'default-src': [ '\'self\'', cdnOrigin, '\'report-sample\'' ],
+          'img-src': [ '\'self\'', 'data:', jsdelivr, `https://*.${ALI_OSS_REGION}.aliyuncs.com`, 'https://keeer.net', 'https://*.keeer.net', 'https://www.google-analytics.com', 'https://payjs.cn' ],
+          'script-src': [
+            '\'self\'', cdnOrigin, jsdelivr, 'https://idframe.keeer.net', 'https://www.google-analytics.com', 'https://ssl.google-analytics.com', '\'report-sample\'',
+            ...(process.env.NODE_ENV === 'development' ? [ '\'unsafe-eval\'' ] : []),
+          ],
+          'style-src': [ '\'self\'', jsdelivr, cdnOrigin, '\'unsafe-inline\'', '\'report-sample\'' ],
+          'font-src': [ '\'self\'', jsdelivr, cdnOrigin, '\'report-sample\'' ],
+          'object-src': [ '\'none\'' ],
+          'form-action': [ '\'self\'', '\'report-sample\'' ],
+          'frame-ancestors': [ '\'self\'' ],
+          'connect-src': [ '\'self\'', 'https://www.google-analytics.com' ],
+          'report-uri': [ '/csp-vio' ],
+        },
       },
-    },
   },
   loading: { color: '#f5fafd' },
   build: {

@@ -110,7 +110,7 @@ export default {
       password: '',
       agreeTerms: false,
       busy: false,
-      title: '登录您的 KEEER 账户',
+      title: '登录您的 KEEER 帐号',
       logoSrc: 'https://keeer.net/img/logo/light-square.jpg',
       backgroundUrl: 'https://nodekas-production.oss-cn-beijing.aliyuncs.com/assets/login-background.jpg',
       backgroundCopyright: '背景图片：CC BY-SA 4.0',
@@ -131,6 +131,8 @@ export default {
   mounted () {
     this.tab = location.hash === '#login' ? 'login' : 'signup'
     this.$nextTick(() => this.loadTabs = true)
+  },
+  created () {
     if (this.useCustom && this.useCustom !== 'redirect' && this.useCustom !== 'git') {
       for (const k of [ 'title', 'logoSrc', 'backgroundUrl' ]) this[k] = this.useCustom[k] || this[k]
       if (this.useCustom.logoSrc) this.customLogo = true
