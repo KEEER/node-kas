@@ -9,6 +9,7 @@ const consola = require('consola')
 const winston = require('winston')
 const koaWinston = require('koa2-winston')
 const { Nuxt, Builder } = require('nuxt')
+const { applyIdframeRoutes } = require('../idframe/serve')
 const { query } = require('./db')
 const { User } = require('./user')
 const { createCashierOrderUrl, createOrder, callback: payjsCallback, getOrderStatus } = require('./payjs')
@@ -101,6 +102,12 @@ const rateLimitPhoneNumber = ctx => {
   app.context.avatarFromName = name => {
     const { ALI_OSS_REGION, ALI_OSS_BUCKET, ALI_OSS_AVATAR_PREFIX } = process.env
     return `https://${ALI_OSS_BUCKET}.${ALI_OSS_REGION}.aliyuncs.com/${ALI_OSS_AVATAR_PREFIX || ''}${name || 'default.svg'}`
+  }
+  app.context.getUserInformation = function () {
+    if (!this.state.user) return null
+    const { avatarName, nickname, keeerId, kredit } = this.state.user.options
+    const avatar = this.avatarFromName(avatarName)
+    return { avatar, nickname, keeerId, kredit }
   }
   app.context.createOrder = async function () {
     try {
@@ -328,9 +335,7 @@ const rateLimitPhoneNumber = ctx => {
       ctx.set('Vary', 'Origin')
       ctx.set('Access-Control-Allow-Credentials', 'true')
     }
-    const { avatarName, nickname, keeerId, kredit } = ctx.state.user.options
-    const avatar = ctx.avatarFromName(avatarName)
-    return ctx.body = { status: 0, result: { avatar, nickname, keeerId, kredit } }
+    return ctx.body = { status: 0, result: ctx.getUserInformation() }
   })
   router.get('/api/sessions', requireLogin, async ctx => ctx.body = { status: 0, result: await ctx.getSessions() })
   router.get('/api/login-config', async ctx => {
@@ -494,7 +499,9 @@ const rateLimitPhoneNumber = ctx => {
     return ctx.body = 'Thank you for reporting a CSP violation!'
   })
 
+  // misc
   applyGiteaRoutes(router)
+  applyIdframeRoutes(router)
 
   const { GLOBAL_LIMIT_HITS, GLOBAL_LIMIT_AGE } = process.env
   if (GLOBAL_LIMIT_HITS && GLOBAL_LIMIT_AGE) app.use(rateLimit(Number(GLOBAL_LIMIT_HITS), Number(GLOBAL_LIMIT_AGE)))
@@ -534,6 +541,7 @@ const rateLimitPhoneNumber = ctx => {
     if (ctx.state.user) {
       ctx.state.user.updateLastSeen(ctx.state.ip).catch(e => consola.warn(e))
     }
+    ctx.res.setHeader('Link', '</api/idframe>; as=script; rel=preload')
     nuxt.render(ctx.req, ctx.res)
   })
   app.listen(port, host)

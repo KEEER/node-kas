@@ -1,6 +1,6 @@
 <template>
   <set-property
-    title="设置您的KEEER ID"
+    title="设置您的 KEEER ID"
     subtitle="请慎重，您仅有 1 次设置机会"
     put-path="/api/keeer-id"
     track="keeer-id"

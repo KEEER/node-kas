@@ -41,10 +41,12 @@ export default {
       return { notLoggedIn: res.code === 'EUNAUTHORIZED', sessions: res.result || [] }
     }
   },
-  inject: [ 'snackbar' ],
+  inject: [ 'snackbar', 'setIdframe' ],
   created () {
     if (this.notLoggedIn) this.$router.push('/login')
   },
+  mounted () { this.setIdframe(true) },
+  beforeDestroy () { this.setIdframe(false) },
   methods: {
     timeString: time => new Date(time).toLocaleString(),
     async logout (session) {

@@ -1,15 +1,15 @@
 <template>
-  <v-app>
-    <!-- <v-app-bar v-if="hasAppBar" fixed app>
-      <v-toolbar-title v-text="title" />
-    </v-app-bar> -->
-    <v-content>
-      <nuxt />
-      <v-snackbar v-model="snackbarModel" :timeout="3200">
-        {{ snackbarText }}
-      </v-snackbar>
-    </v-content>
-  </v-app>
+  <div>
+    <v-app>
+      <v-content>
+        <nuxt />
+        <v-snackbar v-model="snackbarModel" :timeout="3200">
+          {{ snackbarText }}
+        </v-snackbar>
+      </v-content>
+    </v-app>
+    <span v-show="showIdframe" id="idframe" ref="idframe" />
+  </div>
 </template>
 
 <script>
@@ -17,7 +17,7 @@ export default {
   data () {
     return {
       title: 'KEEER Account Service',
-      // hasAppBar: false,
+      showIdframe: false,
       snackbarModel: false,
       snackbarText: '',
       snackbarQueue: [],
@@ -31,6 +31,8 @@ export default {
         this.snackbarText = text
         this.snackbarModel = true
       },
+      setIdframe: val => this.showIdframe = val,
+      reloadIdframe: () => this.reloadIdframe(),
     }
   },
   watch: {
@@ -43,6 +45,28 @@ export default {
       }
     },
   },
+  mounted () { this.reloadIdframe() },
+  methods: {
+    reloadIdframe () {
+      this.$refs.idframe.innerHTML = ''
+      const scriptEl = document.createElement('script')
+      scriptEl.onload = () => {
+        // eslint-disable-next-line no-new
+        new window.idFrame.AppBarFrame({ container: this.$refs.idframe })
+      }
+      scriptEl.src = '/api/idframe'
+      document.head.appendChild(scriptEl)
+    },
+  },
   head () { return { title: 'KAS' } },
 }
 </script>
+
+<style scoped>
+#idframe {
+  top: 12px;
+  right: 12px;
+  position: fixed;
+  --mdc-theme-primary: #f5fafd;
+}
+</style>

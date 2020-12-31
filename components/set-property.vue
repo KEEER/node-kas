@@ -41,32 +41,14 @@ export default {
   data () {
     return { submitting: false }
   },
-  inject: [ 'snackbar' ],
+  inject: [ 'snackbar', 'setIdframe' ],
   computed: {
     valid () {
       return this.validate ? this.validate() : true
     },
   },
-  mounted () {
-    const idFrameEl = document.createElement('span')
-    window.idFrameEl = idFrameEl
-    idFrameEl.style.cssText = 'top: 12px; right: 12px; position: fixed; --mdc-theme-primary: #f5fafd;'
-    const scriptEl = document.createElement('script')
-    scriptEl.src = 'https://idframe.keeer.net/js/appbar.js'
-    document.head.appendChild(scriptEl)
-    document.body.appendChild(idFrameEl)
-    const intervalId = setInterval(function () {
-      if ('idFrame' in window) {
-        clearInterval(intervalId)
-        // eslint-disable-next-line no-new, no-undef
-        new idFrame.AppBarFrame({ container: idFrameEl, base: location.origin })
-      }
-    }, 100)
-  },
-  beforeDestroy () {
-    document.body.removeChild(window.idFrameEl)
-    delete window.idFrameEl
-  },
+  mounted () { this.setIdframe(true) },
+  beforeDestroy () { this.setIdframe(false) },
   methods: {
     back () { this.$router.back() },
     async submit () {

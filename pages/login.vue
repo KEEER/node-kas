@@ -83,7 +83,7 @@
 import SmsVerify from '~/components/sms-verify'
 
 export default {
-  inject: [ 'snackbar' ],
+  inject: [ 'snackbar', 'reloadIdframe' ],
   components: { SmsVerify },
   async asyncData ({ req }) {
     if (process.server) {
@@ -156,6 +156,7 @@ export default {
   },
   methods: {
     proceed () {
+      this.reloadIdframe()
       if (this.useCustom && this.useCustom.redirectUrl) {
         const url = this.useCustom.redirectUrl
         if (/^https?:\/\//.test(url)) location = url
