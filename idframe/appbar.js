@@ -1,4 +1,5 @@
-{
+/* eslint-disable unicorn/prefer-includes */
+;(() => {
   const data = __data__ // eslint-disable-line no-undef
   const defaultItems = [ 'nickname', 'myaccount', 'divider', 'kredit', 'recharge', 'divider', 'logout' ]
   const shortItems = {
@@ -133,7 +134,7 @@
      * @param {(string|object)[]} items items to be displayed.
      */
     updateItems (items) {
-      if (!Array.isArray(items)) throw new TypeError('Items not an array')
+      if (!items || items.length === undefined) throw new TypeError('Items not an array')
       const oldItems = this.items
       this.items = items
       try {
@@ -203,7 +204,7 @@
     let has = !used[i][0]
     if (!('mdc' in window.idFrame) || !window.idFrame.mdc.style) {
       for (let j = 0; j < document.styleSheets.length; j++) {
-        if ((document.styleSheets[j].href || '').includes(i)) has = true
+        if ((document.styleSheets[j].href || '').indexOf(i) > -1) has = true
       }
       if (!has) {
         const el = document.createElement('link')
@@ -215,7 +216,7 @@
     if (!('mdc' in window.idFrame) || !window.idFrame.mdc.script) {
       has = !used[i][1]
       for (let j = 0; j < document.scripts.length; j++) {
-        if ((document.scripts[j].src || '').includes(i)) has = true
+        if ((document.scripts[j].src || '').indexOf(i) > -1) has = true
       }
       if (!has) {
         const el = document.createElement('script')
@@ -224,4 +225,4 @@
       }
     }
   }
-}
+})()
