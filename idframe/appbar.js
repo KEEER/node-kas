@@ -8,7 +8,7 @@
     myaccount: () => ({ text: '管理帐号信息', link: url('/') }),
     kredit: () => ({ text: 'Kredit 余额：' + data.kredit / 100 }),
     recharge: () => ({ text: '充值', link: url('/recharge') }),
-    logout: () => ({ text: '退出登录', id: 'idframe-log-out', onclick: () => window.idFrame.logout() }),
+    logout: () => ({ text: '退出登录', id: 'idframe-log-out', onclick: () => { window.idFrame.logout() } }),
   }
 
   const url = path => data.base + path
@@ -16,9 +16,14 @@
   if (!('idFrame' in window)) window.idFrame = {}
   if (!('logout' in window.idFrame)) window.idFrame.logout = () => {
     const req = new XMLHttpRequest()
-    req.onload = () => location.reload()
-    req.onerror = () => alert('网络错误')
+    req.withCredentials = true
+    req.onload = () => {
+      if (typeof window.idFrame.logoutCallback === 'function') window.idFrame.logoutCallback()
+      else location.reload()
+    }
+    req.onerror = () => { alert('网络错误') }
     req.open('DELETE', url('/api/token?set-cookie=true'))
+    req.send()
   }
 
   const waitMdc = new Promise((resolve, reject) => {
@@ -28,7 +33,7 @@
       if (!('mdc' in window)) return
       if ('ripple' in window.mdc && 'menu' in window.mdc) return resolve()
     }, 200)
-    setTimeout(() => clearInterval(intervalId), timeout)
+    setTimeout(() => { clearInterval(intervalId) }, timeout)
   })
 
   /**
@@ -73,12 +78,13 @@
           const els = this.container.querySelectorAll('.mdc-button')
           for (let i = 0; i < els.length; i++) window.mdc.ripple.MDCRipple.attachTo(els[i])
         } else { // logged in
-          this.container.innerHTML = `<span class="idframe idframe--appbar" role="button" title="KEEER 帐号">
-            <span class="idframe--appbar__avatar" style="background-image: url('${data.avatar})"></span>
-            <span class="idframe--appbar__nickname" dir="ltr">${esc(data.nickname)}</span>
-            <span class="idframe--appbar__dropdown-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg></span>
-          </span>`
-          this.container.firstElementChild.onclick = () => this._menu.open = true
+          this.container.innerHTML = `
+<span class="idframe idframe--appbar" role="button" title="KEEER 帐号">
+  <span class="idframe--appbar__avatar" style="background-image: url('${data.avatar}')"></span>
+  <span class="idframe--appbar__nickname" dir="ltr">${esc(data.nickname)}</span>
+  <span class="idframe--appbar__dropdown-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg></span>
+</span>`
+          this.container.firstElementChild.onclick = () => { this._menu.open = true }
           this.updateItems(this.config.items || [].concat(defaultItems))
         }
       })
@@ -116,7 +122,7 @@
         this._menuEl = document.createElement('div')
         this._menuEl.className = 'mdc-menu mdc-menu-surface'
         el.appendChild(this._menuEl)
-        this.ready.then(() => this.container.firstElementChild.appendChild(el))
+        this.ready.then(() => { this.container.firstElementChild.appendChild(el) })
       }
       html += '</ul>'
       this._menuEl.innerHTML = html
@@ -150,46 +156,46 @@
   // initialize styles
   const styleEl = document.createElement('style')
   styleEl.innerHTML = `
-  .idframe--appbar {
-    cursor: pointer;
-    user-select: none;
-    display: flex;
-    align-items: center;
-  }
-  .idframe--not-logged-in {
-    margin-top: 2px;
-    margin-right: 2px;
-  }
+.idframe--appbar {
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+}
+.idframe--not-logged-in {
+  margin-top: 2px;
+  margin-right: 2px;
+}
+.idframe--appbar__nickname {
+  font-size: 16px;
+  margin: 0 4px 0 8px;
+  color: var(--mdc-theme-primary, black);
+}
+@media(max-width: 599px) {
   .idframe--appbar__nickname {
-    font-size: 16px;
-    margin: 0 4px 0 8px;
-    color: var(--mdc-theme-primary, black);
+    display: none;
   }
-  @media(max-width: 599px) {
-    .idframe--appbar__nickname {
-      display: none;
-    }
-  }
-  .idframe--appbar__avatar {
-    width: 40px;
-    height: 40px;
-    background-size: contain;
-    display: inline-block;
-    border-radius: 4px;
-  }
-  .idframe--appbar .mdc-menu-surface--anchor {
-    align-self: start;
-  }
-  .idframe--appbar .idframe-list-item--disabled .mdc-list-item__text {
-    opacity: .5;
-  }
-  .idframe--appbar__dropdown-icon, .idframe--appbar__dropdown-icon svg {
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    opacity: .8;
-    fill: var(--mdc-theme-primary, black);
-  }`
+}
+.idframe--appbar__avatar {
+  width: 40px;
+  height: 40px;
+  background-size: contain;
+  display: inline-block;
+  border-radius: 4px;
+}
+.idframe--appbar .mdc-menu-surface--anchor {
+  align-self: start;
+}
+.idframe--appbar .idframe-list-item--disabled .mdc-list-item__text {
+  opacity: .5;
+}
+.idframe--appbar__dropdown-icon, .idframe--appbar__dropdown-icon svg {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  opacity: .8;
+  fill: var(--mdc-theme-primary, black);
+}`
   document.head.appendChild(styleEl)
 
   // initialize MDC

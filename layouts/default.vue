@@ -49,6 +49,8 @@ export default {
   methods: {
     reloadIdframe () {
       this.$refs.idframe.innerHTML = ''
+      if (!window.idFrame) window.idFrame = {}
+      window.idFrame.logoutCallback = () => this.$router.push('/login#login')
       const scriptEl = document.createElement('script')
       scriptEl.onload = () => {
         // eslint-disable-next-line no-new

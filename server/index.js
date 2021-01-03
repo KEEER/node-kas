@@ -137,6 +137,14 @@ const rateLimitPhoneNumber = ctx => {
     const regexp = /(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i
     return regexp.test(this.get('User-Agent'))
   }
+  app.context.allowKeeerOrigin = function () {
+    if (/^https?:\/\/(?:[^.]+\.)?keeer.net$/.test(this.get('origin'))) {
+      this.set('Vary', 'Origin')
+      this.set('Access-Control-Allow-Origin', this.get('origin'))
+      this.set('Access-Control-Allow-Credentials', 'true')
+      this.set('Access-Control-Allow-Methods', this.get('Access-Control-Request-Method') || this.method)
+    }
+  }
   router/* nodoc */.all('/api/*', async (ctx, next) => {
     try {
       await next()
@@ -330,11 +338,7 @@ const rateLimitPhoneNumber = ctx => {
 
   // queries
   router.get('/api/user-information', requireLogin, ctx => {
-    if (/^https?:\/\/(?:[^.]+\.)?keeer.net$/.test(ctx.get('origin'))) {
-      ctx.set('Access-Control-Allow-Origin', ctx.get('origin'))
-      ctx.set('Vary', 'Origin')
-      ctx.set('Access-Control-Allow-Credentials', 'true')
-    }
+    ctx.allowKeeerOrigin()
     return ctx.body = { status: 0, result: ctx.getUserInformation() }
   })
   router.get('/api/sessions', requireLogin, async ctx => ctx.body = { status: 0, result: await ctx.getSessions() })
@@ -457,7 +461,12 @@ const rateLimitPhoneNumber = ctx => {
     if (ctx.query['set-cookie']) setTokenCookie(ctx, token)
     return ctx.body = { status: 0, message: '登录成功', result: token }
   })
+  router.options('/api/token/:token?', ctx => {
+    if (ctx.get('Access-Control-Request-Method') === 'DELETE') ctx.allowKeeerOrigin()
+    ctx.status = 204
+  })
   router.delete('/api/token/:token?', async ctx => { // log out
+    ctx.allowKeeerOrigin()
     const token = ctx.params.token || ctx.cookies.get(process.env.TOKEN_COOKIE_NAME)
     if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(token)) {
       const res = await query('DELETE FROM PRE_sessions WHERE token = $1;', [ token ])
@@ -541,7 +550,6 @@ const rateLimitPhoneNumber = ctx => {
     if (ctx.state.user) {
       ctx.state.user.updateLastSeen(ctx.state.ip).catch(e => consola.warn(e))
     }
-    ctx.res.setHeader('Link', '</api/idframe>; as=script; rel=preload')
     nuxt.render(ctx.req, ctx.res)
   })
   app.listen(port, host)

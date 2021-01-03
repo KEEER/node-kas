@@ -32,7 +32,7 @@
         <v-list-item>您的 Kredit 余额：{{ kredit / 100 }}</v-list-item>
         <settings-item title="充值" to="/recharge" />
       </settings-group>
-      <v-btn outlined color="error" @click="logout">退出登录</v-btn>
+      <v-btn class="logout" outlined color="error" @click="logout">退出登录</v-btn>
     </container>
     <container dark>
       Copyright &copy; 2015-present KEEER. All rights reserved.
@@ -136,4 +136,6 @@ export default {
   font-size: 16px;
   top: -4px;
 }
+
+.logout { margin: 0 16px; }
 </style>
