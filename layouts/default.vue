@@ -68,6 +68,7 @@ export default {
 #idframe {
   top: 12px;
   right: 12px;
+  z-index: 99;
   position: fixed;
   --mdc-theme-primary: #f5fafd;
 }
