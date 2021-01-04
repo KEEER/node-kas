@@ -8,7 +8,7 @@
     myaccount: () => ({ text: '管理帐号信息', link: url('/') }),
     kredit: () => ({ text: 'Kredit 余额：' + data.kredit / 100 }),
     recharge: () => ({ text: '充值', link: url('/recharge') }),
-    logout: () => ({ text: '退出登录', id: 'idframe-log-out', onclick: () => { window.idFrame.logout() } }),
+    logout: () => ({ text: '退出登录', onclick: () => { window.idFrame.logout() } }),
   }
 
   const url = path => data.base + path
@@ -42,7 +42,7 @@
    * @param {string|HTMLElement} config.container IDFrame container, string will be interpreted as selector
    * @param {string} [config.loginUrl] login button URL
    * @param {string} [config.signupUrl] signup button URL
-   * @param {(string|object)[]} [config.items] items to show
+   * @param {string|object} [config.items[]] items to show
    * @param {string} [config.serviceName] KAS service name to include in login and sign up URLs
    */
   window.idFrame.AppBarFrame = class AppBarFrame {
@@ -71,10 +71,10 @@
       return waitMdc.then(() => {
         if (!data.loggedIn) {
           this.container.innerHTML = `
-          <span class="idframe idframe--appbar idframe--not-logged-in">
-            <a class="mdc-button" href="${this.loginUrl}"><div class="mdc-button__ripple"></div><span class="mdc-button__label">登录</span></a>&nbsp;
-            <a class="mdc-button mdc-button--outlined" href="${this.signupUrl}"><div class="mdc-button__ripple"></div><span class="mdc-button__label">注册</span></a>
-          </span>`
+<span class="idframe idframe--appbar idframe--not-logged-in">
+  <a class="mdc-button" href="${this.loginUrl}"><div class="mdc-button__ripple"></div><span class="mdc-button__label">登录</span></a>&nbsp;
+  <a class="mdc-button mdc-button--outlined" href="${this.signupUrl}"><div class="mdc-button__ripple"></div><span class="mdc-button__label">注册</span></a>
+</span>`
           const els = this.container.querySelectorAll('.mdc-button')
           for (let i = 0; i < els.length; i++) window.mdc.ripple.MDCRipple.attachTo(els[i])
         } else { // logged in
@@ -108,8 +108,7 @@
         else if ('link' in item) {
           html += `<a class="mdc-list-item" role="menuitem" href="${item.link}"><span class="mdc-list-item__text">${esc(item.text)}</span></a>`
         } else if ('onclick' in item) {
-          if (!('id' in item)) throw new Error(`Item ${item} has an onclick listener without ID.`)
-          const id = `${item.id}-${Math.floor(Math.random() * 100000)}`
+          const id = `idframe-click-${i}-${Math.floor(Math.random() * 1000000)}`
           listeners[id] = item.onclick
           html += `<a id="${id}" class="mdc-list-item" role="menuitem" href="javascript:;"><span class="mdc-list-item__text">${esc(item.text)}</span></a>`
         } else {
@@ -137,7 +136,7 @@
 
     /**
      * Updates menu items.
-     * @param {(string|object)[]} items items to be displayed.
+     * @param {string|object} items[] items to be displayed.
      */
     updateItems (items) {
       if (!items || items.length === undefined) throw new TypeError('Items not an array')

@@ -254,8 +254,42 @@ Form fields:
 - `{ status: 4, message: '手机号不正确', code: 'EINVALID_PHONE_NUMBER' }`
 - `{ status: 5, message: '您已经注册，请直接登录或找回密码', code: 'EDUPLICATE' }`
 
+### `GET /api/idframe`
+See [IDFrame](#idframe).
+
 ## CSRF
 Set a cookie named `_csrf` with a random value, and submit this random value in a form field called `_csrf`.
+
+## IDFrame
+IDFrame is a functionality built into Node KAS that was previously available at `https://idframe.keeer.net/js/appbar.js`. It allows KEEER services to show a box containing user information or log in links at the top-right of a page, in order to provide common look and feel for KAS. IDFrame can only be called with a `*.keeer.net` referrer. Usage is shown below.
+
+### Getting started for IDFrame
+```html
+<div id="idframe"></div>
+<style>#idframe { position: fixed; top: 12px; right: 12px; }</style>
+<script src="https://account.keeer.net/api/idframe"></script>
+<script>new idFrame.AppBarFrame({ container: '#idframe' })</script>
+```
+
+### API for IDFrame
+#### `idFrame.AppBarFrame`
+Class representing a IDFrame object.
+
+##### `new AppBarFrame()`
+| Param | Type | Description |
+| --- | --- | --- |
+| `config.container` | `string` \| `HTMLElement` | IDFrame container, string will be interpreted as selector |
+| `[config.loginUrl]` | `string` | login button URL |
+| `[config.signupUrl]` | `string` | signup button URL |
+| `[config.items[]]` | `string` \| `object` | items to show |
+| `[config.serviceName]` | `string` | KAS service name to include in login and sign up URLs |
+
+### appBarFrame.updateItems(items[])
+Updates menu items.
+
+| Param | Type | Description |
+| --- | --- | --- |
+| `items[]` | `string` \| `object` | items to be displayed. |
 
 ## Build Setup
 
