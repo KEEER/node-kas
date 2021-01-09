@@ -21,6 +21,8 @@ const { validateKeeerId, validateNickname } = require('./filter')
 const randomBytes = promisify(randomBytesCb)
 
 const app = new Koa()
+app.proxy = true
+app.proxyIpHeader = process.env.REAL_IP_HEADER || 'X-Forwarded-For'
 const config = require('../nuxt.config.js') // eslint-disable-line import/order
 config.dev = app.env !== 'production'
 
@@ -534,7 +536,8 @@ const rateLimitPhoneNumber = ctx => {
   app.use(async (ctx, next) => { // common headers
     ctx.set('X-Frame-Options', 'SAMEORIGIN')
     ctx.set('X-Powered-By', 'KEEER Account System v4/1.0.1')
-    ctx.state.ip = ctx.get(process.env.REAL_IP_HEADER || 'X-Forwarded-For') || ctx.request.ip
+    const ips = ctx.ips
+    ctx.state.ip = ips[ips.length - 1] || ctx.request.ip
     return await next()
   })
   app.use(async (ctx, next) => {
