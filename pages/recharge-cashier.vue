@@ -28,6 +28,7 @@ export default {
       destroyed: false,
     }
   },
+  head: () => ({ title: '充值收银台' }),
   computed: {
     pollUrl () {
       const url = new URL('/api/recharge-order', location.href)
@@ -68,7 +69,6 @@ export default {
       }
     },
   },
-  head () { return { title: '充值收银台' } },
 }
 </script>
 

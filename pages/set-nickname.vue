@@ -18,12 +18,8 @@
   </set-property>
 </template>
 <script>
-import SetProperty from '~/components/set-property'
 export default {
-  components: { SetProperty },
-  data () {
-    return { nickname: '' }
-  },
-  head () { return { title: '设置昵称' } },
+  data: () => ({ nickname: '' }),
+  head: () => ({ title: '设置昵称' }),
 }
 </script>

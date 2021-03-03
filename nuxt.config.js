@@ -9,7 +9,7 @@ if (process.env.NODE_ENV !== 'production') publicPath = '/_nuxt/'
 
 module.exports = {
   telemetry: false,
-  mode: 'universal',
+  components: true,
   head: {
     titleTemplate: '%s | KEEER 帐号',
     title: '',

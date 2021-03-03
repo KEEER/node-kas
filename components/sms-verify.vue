@@ -11,12 +11,12 @@
 
 <script>
 export default {
+  inject: [ 'snackbar' ],
   props: {
     value: { type: String, default: '' },
     number: { type: String, required: true },
     type: { type: String, required: true },
   },
-  inject: [ 'snackbar' ],
   data () {
     return {
       code: this.value,

@@ -28,14 +28,8 @@
   </set-property>
 </template>
 <script>
-import SetProperty from '~/components/set-property'
-import SmsVerify from '~/components/sms-verify'
-
 export default {
-  components: { SetProperty, SmsVerify },
-  data () {
-    return { number: '', code: '', password: '' }
-  },
-  head () { return { title: '变更手机号' } },
+  data: () => ({ number: '', code: '', password: '' }),
+  head: () => ({ title: '变更手机号' }),
 }
 </script>

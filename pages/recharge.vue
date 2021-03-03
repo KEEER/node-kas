@@ -82,9 +82,8 @@ export default {
       }
     }
   },
-  data () {
-    return { amount: '' }
-  },
+  data: () => ({ amount: '' }),
+  head: () => ({ title: '充值 Kredit' }),
   created () {
     if (this.notLoggedIn) this.$router.push('/login')
   },
@@ -102,7 +101,6 @@ export default {
       else this.$router.push(result)
     },
   },
-  head () { return { title: '充值 Kredit ' } },
 }
 </script>
 

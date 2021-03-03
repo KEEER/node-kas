@@ -23,11 +23,9 @@
 </template>
 
 <script>
-import Headline from '~/components/headline'
-import Container from '~/components/container'
 const getSessions = () => fetch('/api/sessions', { credentials: 'same-origin' }).then(res => res.json())
 export default {
-  components: { Headline, Container },
+  inject: [ 'snackbar', 'setIdframe' ],
   async asyncData ({ req }) {
     if (process.server) {
       const { ctx } = req
@@ -41,7 +39,7 @@ export default {
       return { notLoggedIn: res.code === 'EUNAUTHORIZED', sessions: res.result || [] }
     }
   },
-  inject: [ 'snackbar', 'setIdframe' ],
+  head: () => ({ title: '登录设备管理 ' }),
   created () {
     if (this.notLoggedIn) this.$router.push('/login')
   },
@@ -67,7 +65,6 @@ export default {
       }
     },
   },
-  head () { return { title: '登录设备管理 ' } },
 }
 </script>
 <style scoped>

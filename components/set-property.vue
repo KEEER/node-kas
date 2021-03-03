@@ -22,10 +22,8 @@
 
 <script>
 /* eslint-disable vue/require-default-prop */
-import Headline from '~/components/headline'
-import Container from '~/components/container'
 export default {
-  components: { Headline, Container },
+  inject: [ 'snackbar', 'setIdframe' ],
   props: {
     noSubmit: Boolean,
     title: String,
@@ -38,10 +36,7 @@ export default {
     },
     track: String,
   },
-  data () {
-    return { submitting: false }
-  },
-  inject: [ 'snackbar', 'setIdframe' ],
+  data: () => ({ submitting: false }),
   computed: {
     valid () {
       return this.validate ? this.validate() : true

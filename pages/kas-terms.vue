@@ -316,8 +316,8 @@
 
 <script>
 export default {
+  head: () => ({ title: 'KEEER 帐号服务协议' }),
   methods: { back () { this.$router.back() } },
-  head () { return { title: 'KEEER 帐号服务协议' } },
 }
 </script>
 

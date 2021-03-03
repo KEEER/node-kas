@@ -27,12 +27,8 @@
   </set-property>
 </template>
 <script>
-import SetProperty from '~/components/set-property'
 export default {
-  components: { SetProperty },
-  data () {
-    return { current: '', password: '' }
-  },
-  head () { return { title: '修改密码' } },
+  data: () => ({ current: '', password: '' }),
+  head: () => ({ title: '修改密码' }),
 }
 </script>

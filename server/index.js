@@ -140,7 +140,7 @@ const rateLimitPhoneNumber = ctx => {
     return regexp.test(this.get('User-Agent'))
   }
   app.context.allowKeeerOrigin = function () {
-    if (/^https?:\/\/(?:[^.]+\.)?keeer.net$/.test(this.get('origin'))) {
+    if (/^https?:\/\/(?:[^.]+\.)?keeer.(net|local)$/.test(this.get('origin'))) {
       this.set('Vary', 'Origin')
       this.set('Access-Control-Allow-Origin', this.get('origin'))
       this.set('Access-Control-Allow-Credentials', 'true')

@@ -19,12 +19,8 @@
   </set-property>
 </template>
 <script>
-import SetProperty from '~/components/set-property'
 export default {
-  components: { SetProperty },
-  data () {
-    return { id: '' }
-  },
-  head () { return { title: '设置 KEEER ID' } },
+  data: () => ({ id: '' }),
+  head: () => ({ title: '设置 KEEER ID' }),
 }
 </script>

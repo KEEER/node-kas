@@ -51,8 +51,8 @@
 
 <script>
 export default {
+  head: () => ({ title: 'Kredit 条款' }),
   methods: { back () { this.$router.back() } },
-  head () { return { title: 'Kredit 条款' } },
 }
 </script>
 

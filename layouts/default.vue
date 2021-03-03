@@ -1,12 +1,12 @@
 <template>
   <div>
     <v-app>
-      <v-content>
+      <v-main>
         <nuxt />
         <v-snackbar v-model="snackbarModel" :timeout="3200">
           {{ snackbarText }}
         </v-snackbar>
-      </v-content>
+      </v-main>
     </v-app>
     <span v-show="showIdframe" id="idframe" ref="idframe" />
   </div>
@@ -14,15 +14,6 @@
 
 <script>
 export default {
-  data () {
-    return {
-      title: 'KEEER Account Service',
-      showIdframe: false,
-      snackbarModel: false,
-      snackbarText: '',
-      snackbarQueue: [],
-    }
-  },
   provide () {
     return {
       layout: this,
@@ -35,6 +26,16 @@ export default {
       reloadIdframe: () => this.reloadIdframe(),
     }
   },
+  data () {
+    return {
+      title: 'KEEER Account Service',
+      showIdframe: false,
+      snackbarModel: false,
+      snackbarText: '',
+      snackbarQueue: [],
+    }
+  },
+  head: () => ({ title: 'KAS' }),
   watch: {
     snackbarModel (val) {
       if (!val && this.snackbarQueue.length > 0) {
@@ -60,7 +61,6 @@ export default {
       document.head.appendChild(scriptEl)
     },
   },
-  head () { return { title: 'KAS' } },
 }
 </script>
 

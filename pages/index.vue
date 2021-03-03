@@ -9,7 +9,7 @@
           <v-list-item-action>
             <div class="avatar-editable">
               <div class="avatar-wrapper">
-                <img ref="avatarImg" class="avatar-img" :src="avatar" aria-hidden="true">
+                <img class="avatar-img" :src="avatar" aria-hidden="true" @error="avatar = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjwvc3ZnPg=='">
               </div>
               <div class="avatar-mask">
                 <v-icon color="#f5fafd" class="avatar-mask-icon">mdi-pencil</v-icon>
@@ -41,12 +41,7 @@
 </template>
 
 <script>
-import Container from '~/components/container'
-import Headline from '~/components/headline'
-import SettingsItem from '~/components/settings-item'
-import SettingsGroup from '~/components/settings-group'
 export default {
-  components: { Container, SettingsItem, SettingsGroup, Headline },
   inject: [ 'snackbar' ],
   async asyncData ({ req }) {
     const notLoggedIn = {
@@ -74,11 +69,9 @@ export default {
       }
     }
   },
+  head: () => ({ title: '我的帐号' }),
   created () {
     if (this.notLoggedIn) this.$router.push('/login')
-  },
-  mounted () {
-    this.$refs.avatarImg.onerror = () => this.$refs.avatarImg.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjwvc3ZnPg=='
   },
   methods: {
     async logout () {
@@ -95,7 +88,6 @@ export default {
       }
     },
   },
-  head () { return { title: '我的帐号' } },
 }
 </script>
 

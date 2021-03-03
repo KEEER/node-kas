@@ -19,12 +19,8 @@
   </set-property>
 </template>
 <script>
-import SetProperty from '~/components/set-property'
 export default {
-  components: { SetProperty },
-  data () {
-    return { email: '' }
-  },
-  head () { return { title: '设置电子邮箱' } },
+  data: () => ({ email: '' }),
+  head: () => ({ title: '设置电子邮箱' }),
 }
 </script>

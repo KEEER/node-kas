@@ -80,11 +80,8 @@
 </template>
 
 <script>
-import SmsVerify from '~/components/sms-verify'
-
 export default {
   inject: [ 'snackbar', 'reloadIdframe' ],
-  components: { SmsVerify },
   async asyncData ({ req }) {
     if (process.server) {
       const { ctx } = req
@@ -118,6 +115,7 @@ export default {
       customLogo: false,
     }
   },
+  head: () => ({ title: '登录' }),
   computed: {
     signupValid () {
       return this.identity && this.code && this.password && this.agreeTerms
@@ -206,7 +204,6 @@ export default {
       this.busy = false
     },
   },
-  head () { return { title: '登录' } },
 }
 </script>
 

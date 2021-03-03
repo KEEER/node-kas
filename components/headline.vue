@@ -5,9 +5,7 @@
   </container>
 </template>
 <script>
-import Container from '~/components/container'
 export default {
-  components: { Container },
   props: { title: String, subtitle: String }, // eslint-disable-line vue/require-default-prop
 }
 </script>

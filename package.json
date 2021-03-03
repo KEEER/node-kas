@@ -13,7 +13,9 @@
     "lint": "eslint --ext .js,.vue --ignore-path .eslintignore ."
   },
   "babel": {
-    "presets": [ "@babel/env" ]
+    "presets": [
+      "@babel/env"
+    ]
   },
   "dependencies": {
     "@keeer/libphonenumber": "^1.7.44-keeer1",

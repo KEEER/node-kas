@@ -31,12 +31,9 @@
   </set-property>
 </template>
 <script>
-import SetProperty from '~/components/set-property'
 export default {
-  components: { SetProperty },
-  data () {
-    return { valid: false, csrf: '' }
-  },
+  data: () => ({ valid: false, csrf: '' }),
+  head: () => ({ title: '设置头像' }),
   methods: {
     previewFile () {
       const file = this.$refs.avatar.files[0]
@@ -53,7 +50,6 @@ export default {
       }
     },
   },
-  head () { return { title: '设置头像' } },
 }
 </script>
 <style>
