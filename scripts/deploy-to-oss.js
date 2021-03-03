@@ -16,7 +16,6 @@ const consola = require('consola')
   const store = new OSS(cfg)
   const distDir = '.nuxt/dist/client'
   for (const file of await readdir(distDir)) {
-    if (file.includes('idframe')) continue
     await store.put(path.join(process.env.ALI_OSS_ASSETS_PREFIX || '', file), path.join(distDir, file), {
       headers: { 'Cache-Control': 'public, max-age=31536000' },
     })

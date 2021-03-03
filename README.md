@@ -297,12 +297,26 @@ Updates menu items.
 # install dependencies
 $ npm install
 
+# initialize project
+$ cp sample.env .env
+$ vi .env # edit application config
+$ node scripts/db-init # initialize database
+
 # serve with hot reload at localhost:3000
 $ npm run dev
+
+# add a service
+$ node scripts/add-service
+
+# deploy assets to Aliyun OSS (optional)
+$ node scripts/deploy-to-oss
 
 # build for production and launch server
 $ npm run build
 $ npm run start
+
+# update database schema
+$ node scripts/migrate-database
 ```
 
 Please do not run the content in `sql/migration` directly. Instead, use the script at `scripts/migrate-database`.
