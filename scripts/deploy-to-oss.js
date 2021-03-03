@@ -1,9 +1,10 @@
 require('dotenv').config()
 
-const { readdir } = require('fs').promises
 const path = require('path')
 const OSS = require('ali-oss')
 const consola = require('consola')
+
+const files = require('../.nuxt/dist/server/client.manifest.json').all.filter(file => !file.startsWith('.'))
 
 ;(async () => {
   const cfg = {
@@ -15,9 +16,9 @@ const consola = require('consola')
   if (Object.values(cfg).some(x => typeof x !== 'string')) throw new Error('Invalid config')
   const store = new OSS(cfg)
   const distDir = '.nuxt/dist/client'
-  for (const file of await readdir(distDir)) {
+  for (const file of files) {
     await store.put(path.join(process.env.ALI_OSS_ASSETS_PREFIX || '', file), path.join(distDir, file), {
-      headers: { 'Cache-Control': 'public, max-age=31536000' },
+      headers: file === 'LICENSES' ? {} : { 'Cache-Control': 'public, max-age=31536000, immutable' },
     })
   }
 })().catch(e => {
