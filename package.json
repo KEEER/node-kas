@@ -8,6 +8,7 @@
     "dev": "cross-env NODE_ENV=development nodemon server/index.js --watch server",
     "build": "cross-env NODE_ENV=production nuxt build",
     "build:idframe": "babel idframe/appbar.js | uglifyjs -mc > idframe/appbar.dist.js",
+    "build:title-font": "node scripts/build-title-font",
     "start": "cross-env NODE_ENV=production node server/index.js",
     "generate": "nuxt generate",
     "lint": "eslint --ext .js,.vue --ignore-path .eslintignore ."
@@ -46,6 +47,7 @@
     "babel-eslint": "^10.0.1",
     "eslint": "^7.0.0",
     "eslint-plugin-nuxt": ">=0.4.2",
+    "font-carrier2": "^0.2.0",
     "inquirer": "^7.1.0",
     "nodemon": "^1.18.9"
   }

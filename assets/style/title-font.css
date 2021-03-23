@@ -1,0 +1,6 @@
+@font-face {
+  font-family: 'SHSans EL';
+  font-weight: 200;
+  src: url('~assets/font/title.woff2') format('woff2'),
+    url('~assets/font/title.woff') format('woff');
+}

@@ -1,6 +1,8 @@
 <template>
   <div>
-    <headline :title="`欢迎 ${nickname || '新用户'}`" subtitle="您在 KEEER 服务中使用的基本信息，点击以编辑它们" />
+    <headline subtitle="您在 KEEER 服务中使用的基本信息，点击以编辑它们">
+      欢迎 <span class="username" dir="ltr">{{ nickname || '新用户' }}</span>
+    </headline>
     <container>
       <settings-group title="个人资料">
         <settings-item :title="`昵称：${nickname || '未设置'}`" to="/set-nickname" />
@@ -92,6 +94,8 @@ export default {
 </script>
 
 <style scoped>
+.username { font-family: Roboto, sans-serif !important; }
+
 .avatar-editable {
   -webkit-flex-grow: 0;
   flex-grow: 0;

@@ -321,6 +321,7 @@ export default {
 }
 </script>
 
+<style src="~/assets/style/title-font.css" />
 <style scoped>
 #wrapper {
   background-color: #f5fafd;
@@ -337,6 +338,7 @@ export default {
   }
 }
 h1 {
+  font-family: 'SHSans EL';
   font-size: 3rem;
   font-weight: 200;
   line-height: 3.125rem;
